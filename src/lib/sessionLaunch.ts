@@ -115,8 +115,8 @@ export function buildAgentLaunch(
     }
   }
 
-  // freebuff/mimo (e qualquer agente sem sintaxe própria de resume): só executa o
-  // binário com os args base. freebuff não documenta flag de resume; o Mimo Code
-  // retoma a sessão automaticamente via memória persistente, sem flag.
+  // hermes/pi (e qualquer agente sem sintaxe própria de resume): só executa o
+  // binário com os args base. Hermes e Pi não documentam flag de resume; retomam
+  // a sessão automaticamente via memória persistente, sem flag.
   return { args: [...baseArgs], sessionId: undefined, createdSession: false }
 }

@@ -52,6 +52,7 @@ export const ptBR: Record<MessageKey, string> = {
   'onboarding.photoHint': 'Opcional. Fica escondida até você abrir.',
   'onboarding.languageEnglishHint': 'Usar a interface em inglês.',
   'onboarding.languagePortugueseHint': 'Usar a interface em português.',
+  'onboarding.languageSpanishHint': 'Usar a interface em espanhol.',
   'onboarding.themeTitle': 'Escolha um tema',
   'onboarding.themeSubtitle': 'Escolha a paleta que combina com o ambiente. Dá pra trocar depois.',
   'onboarding.agentsTitle': 'Agentes',
@@ -75,12 +76,12 @@ export const ptBR: Record<MessageKey, string> = {
   'onboarding.finish': 'Finalizar configuração',
 
   /* ---- agents ---- */
-  'agent.shell.desc': 'PowerShell · cmd',
+  'agent.shell.desc': 'PowerShell · cmd · bash',
   'agent.claude.desc': 'Anthropic CLI',
   'agent.codex.desc': 'OpenAI CLI',
   'agent.opencode.desc': 'Open source',
-  'agent.freebuff.desc': 'Agente grátis',
-  'agent.mimo.desc': 'CLI da Xiaomi',
+  'agent.hermes.desc': 'Ponte de mensageria multiplataforma',
+  'agent.pi.desc': 'CLI de utilidades para busca e análise',
   'agent.antigravity.desc': 'Google Antigravity CLI',
 
   /* ---- image input ---- */

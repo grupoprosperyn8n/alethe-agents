@@ -14,8 +14,8 @@ const ICONS: Record<AgentType, LucideIcon> = {
   codex: Code2,
   antigravity: Sparkles,
   opencode: Boxes,
-  freebuff: Gift,
-  mimo: Bot,
+  hermes: Gift,
+  pi: Bot,
 }
 
 type Hit = {

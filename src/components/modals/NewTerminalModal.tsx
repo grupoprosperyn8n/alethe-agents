@@ -43,8 +43,8 @@ export function NewTerminalModal() {
     codex: false,
     antigravity: false,
     opencode: false,
-    freebuff: false,
-    mimo: false,
+    hermes: false,
+    pi: false,
   })
 
   const visibleAgents = AGENTS.filter((a) => enabled[a.type])
@@ -84,8 +84,8 @@ export function NewTerminalModal() {
       codex: alwaysStartUnrestricted,
       antigravity: alwaysStartUnrestricted,
       opencode: alwaysStartUnrestricted,
-      freebuff: alwaysStartUnrestricted,
-      mimo: alwaysStartUnrestricted,
+      hermes: alwaysStartUnrestricted,
+      pi: alwaysStartUnrestricted,
     })
   }, [open, context?.projectId, inheritedCwd, defaultType, alwaysStartUnrestricted])
 
@@ -99,8 +99,8 @@ export function NewTerminalModal() {
       codex: false,
       antigravity: false,
       opencode: false,
-      freebuff: false,
-      mimo: false,
+      hermes: false,
+      pi: false,
     })
   }
 

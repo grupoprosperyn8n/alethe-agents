@@ -1,5 +1,5 @@
 export type AgentType =
-  'shell' | 'claude' | 'codex' | 'opencode' | 'freebuff' | 'mimo' | 'antigravity'
+  'shell' | 'claude' | 'codex' | 'opencode' | 'antigravity' | 'hermes' | 'pi'
 
 /** Rótulo de exibição de cada agente — fonte única, evita listas paralelas
  * divergentes por componente (ex.: "Claude" vs "Claude Code" pro mesmo tipo). */
@@ -8,21 +8,21 @@ export const AGENT_TYPE_LABELS: Record<AgentType, string> = {
   codex: 'Codex',
   antigravity: 'Antigravity',
   opencode: 'OpenCode',
-  mimo: 'Mimo',
-  freebuff: 'Freebuff',
+  hermes: 'Hermes',
+  pi: 'Pi CLI',
   shell: 'Shell',
 }
 
 /** Ordem canônica de exibição dos tipos de agente — fonte única, evita duas
- * listas paralelas divergindo (ex.: posição do Shell diferente entre o
- * seletor de novo terminal e o de agente de conflito). */
+ * listas paralelas divergindo (ex.: posición del Shell diferente entre el
+ * selector de nuevo terminal y el de agente de conflicto). */
 export const ALL_AGENT_TYPES: AgentType[] = [
   'claude',
   'codex',
   'antigravity',
   'opencode',
-  'mimo',
-  'freebuff',
+  'hermes',
+  'pi',
   'shell',
 ]
 
@@ -30,11 +30,14 @@ export const ALL_AGENT_TYPES: AgentType[] = [
  * enquanto o agente de terminal oficial usa `agy`. */
 export function agentCliCommand(agent: AgentType): string | undefined {
   if (agent === 'shell') return undefined
-  return agent === 'antigravity' ? 'agy' : agent
+  if (agent === 'antigravity') return 'agy'
+  if (agent === 'hermes') return 'hermes'
+  if (agent === 'pi') return 'pi'
+  return agent
 }
 
-/** Idiomas suportados pela UI. `en` é o default. */
-export type Locale = 'en' | 'pt-BR'
+/** Idiomas suportados pela UI. `es` é o default. */
+export type Locale = 'es' | 'en' | 'pt-BR'
 
 export type LayoutMode = 'auto' | 'spotlight' | 'sidebar' | 'grid'
 
@@ -119,9 +122,8 @@ export const UNRESTRICTED_FLAG: Record<AgentType, string | null> = {
   claude: '--dangerously-skip-permissions',
   codex: '--dangerously-bypass-approvals-and-sandbox',
   opencode: '--dangerously-skip-permissions',
-  // freebuff/mimo não documentam flag de skip-permissions própria.
-  freebuff: null,
-  mimo: null,
+  hermes: null,
+  pi: null,
   antigravity: '--dangerously-skip-permissions',
 }
 
@@ -482,8 +484,8 @@ export const DEFAULT_PREFERENCES: Preferences = {
     codex: true,
     antigravity: true,
     opencode: true,
-    freebuff: true,
-    mimo: true,
+    hermes: true,
+    pi: true,
   },
   onboardingDone: false,
   workspaceFlat: false,
@@ -593,13 +595,8 @@ export const PROVIDER_MODELS: Record<AgentType, { id: string; label: string }[]>
     { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
     { id: 'claude-3.7-sonnet', label: 'Claude 3.7 Sonnet' },
   ],
-  mimo: [
-    { id: 'mimo-pro', label: 'Mimo Pro' },
-    { id: 'mimo-flash', label: 'Mimo Flash' },
-  ],
-  freebuff: [
-    { id: 'freebuff-auto', label: 'Freebuff Auto' },
-  ],
+  hermes: [],
+  pi: [],
   shell: [
     { id: 'default', label: 'Shell Padrão' },
   ],

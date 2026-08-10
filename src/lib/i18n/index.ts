@@ -1,13 +1,14 @@
 import { useProjectsStore } from '../../stores/projectsStore'
 import { en, type MessageKey } from './messages/en'
 import { ptBR } from './messages/pt-BR'
+import { es } from './messages/es'
 
 export type { MessageKey }
 
-/** Idiomas suportados. `en` é o default e a fonte-de-verdade das chaves. */
-export type Locale = 'en' | 'pt-BR'
+/** Idiomas soportados. `es` es el default y fuente de verdad de las claves. */
+export type Locale = 'es' | 'en' | 'pt-BR'
 
-export const DEFAULT_LOCALE: Locale = 'en'
+export const DEFAULT_LOCALE: Locale = 'es'
 
 export type LocaleMeta = {
   id: Locale
@@ -18,11 +19,13 @@ export type LocaleMeta = {
 }
 
 export const LOCALES: LocaleMeta[] = [
+  { id: 'es', nativeName: 'Español', intl: 'es-AR' },
   { id: 'en', nativeName: 'English', intl: 'en-US' },
   { id: 'pt-BR', nativeName: 'Português', intl: 'pt-BR' },
 ]
 
 const DICTIONARIES: Record<Locale, Record<string, string>> = {
+  es,
   en,
   'pt-BR': ptBR,
 }

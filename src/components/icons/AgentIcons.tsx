@@ -1,6 +1,5 @@
 import claudeLogo from '../../assets/claude-code.png'
 import codexLogo from '../../assets/codex.png'
-import freebuffLogo from '../../assets/freebuff.png'
 import antigravityLogo from '../../assets/antigravity.png'
 import { iconMap } from '../../assets/icons'
 import type { AgentType, Theme } from '../../lib/types'
@@ -29,12 +28,8 @@ export function CodexIcon({ size = 16 }: { size?: number }) {
   return <img src={codexLogo} alt="" width={size} height={size} draggable={false} />
 }
 
-export function FreebuffIcon({ size = 16 }: { size?: number }) {
-  return <img src={freebuffLogo} alt="" width={size} height={size} draggable={false} />
-}
-
-/** Provisório: lettermark "M" monocromático (currentColor). Trocar pelo logo oficial. */
-export function MimoIcon({ size = 16 }: { size?: number }) {
+/** Lettermark "H" monocromático (currentColor). Trocar pelo logo oficial. */
+export function HermesIcon({ size = 16 }: { size?: number }) {
   return (
     <svg
       width={size}
@@ -45,7 +40,23 @@ export function MimoIcon({ size = 16 }: { size?: number }) {
       strokeWidth="1.5"
     >
       <rect x="2" y="2" width="12" height="12" rx="3" />
-      <path d="M5 11V6l3 3 3-3v5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M5 4v8M11 4v8M5 8h6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+/** Lettermark "π" monocromático (currentColor). Trocar pelo logo oficial. */
+export function PiIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <path d="M3 4h10M6 4v7M10 4v7" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -83,8 +94,8 @@ export function AgentIcon({
   if (type === 'shell') return <ShellIcon size={size} />
   if (type === 'claude') return <ClaudeIcon size={size} />
   if (type === 'codex') return <CodexIcon size={size} />
-  if (type === 'freebuff') return <FreebuffIcon size={size} />
-  if (type === 'mimo') return <MimoIcon size={size} />
+  if (type === 'hermes') return <HermesIcon size={size} />
+  if (type === 'pi') return <PiIcon size={size} />
   if (type === 'antigravity') return <AntigravityIcon size={size} />
   return <OpenCodeIcon size={size} theme={theme} />
 }

@@ -44,8 +44,8 @@ const AGENTS: { id: CodingAgent; label: string }[] = [
   { id: 'codex', label: 'Codex' },
   { id: 'antigravity', label: 'Antigravity' },
   { id: 'opencode', label: 'OpenCode' },
-  { id: 'freebuff', label: 'Freebuff' },
-  { id: 'mimo', label: 'Mimo' },
+  { id: 'hermes', label: 'Hermes' },
+  { id: 'pi', label: 'Pi' },
 ]
 
 const FEATURE_ICONS = {
@@ -269,9 +269,11 @@ export function OnboardingModal() {
                                         {locale.nativeName}
                                       </span>
                                       <span className={styles.languageCardMeta}>
-                                        {locale.id === 'en'
-                                          ? t('onboarding.languageEnglishHint')
-                                          : t('onboarding.languagePortugueseHint')}
+                                        {locale.id === 'es'
+                                          ? t('onboarding.languageSpanishHint')
+                                          : locale.id === 'pt-BR'
+                                            ? t('onboarding.languagePortugueseHint')
+                                            : t('onboarding.languageEnglishHint')}
                                       </span>
                                     </span>
                                     {active ? (

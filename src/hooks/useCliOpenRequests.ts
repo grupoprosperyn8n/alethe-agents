@@ -25,8 +25,8 @@ const AGENT_LABEL: Record<AgentType, string> = {
   antigravity: 'Antigravity',
   opencode: 'OpenCode',
   shell: 'Shell',
-  mimo: 'Mimo',
-  freebuff: 'Freebuff',
+  hermes: 'Hermes',
+  pi: 'Pi',
 }
 
 export function useCliOpenRequests(hydrated: boolean) {

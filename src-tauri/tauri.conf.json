@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Alethe",
-  "version": "1.5.0",
-  "identifier": "com.kc1t.alethe",
+  "productName": "SO Multi Agente",
+  "version": "0.1.0",
+  "identifier": "com.sistemasagenticos.so-multi-agente",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1422",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Alethe",
+        "title": "SO Multi Agente",
         "width": 1280,
         "height": 800,
         "minWidth": 800,
@@ -29,9 +29,9 @@
     "active": true,
     "createUpdaterArtifacts": true,
     "targets": "all",
-    "publisher": "Kauã Miguel",
-    "shortDescription": "Terminal multiplexer GUI",
-    "longDescription": "Alethe is a Windows-first terminal multiplexer GUI: projects on the left, split-pane terminals on the right, with sub-tabs per pane.",
+      "publisher": "Sistemas Agenticos",
+      "shortDescription": "Orquestador multi-agente de escritorio",
+      "longDescription": "SO Multi Agente es un workspace de escritorio para coordinar agentes de codigo (OpenCode, Codex, Antigravity, Hermes, Pi) y terminales reales en paralelo.",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -48,7 +48,7 @@
   "plugins": {
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdERjQwQTVDMDJFMDY3QzQKUldURVorQUNYQXIwZlpTZjNhc1dNamhiSERnalducjJCdDdiR0NFYy8ydnJqcU52VG05cFNqcHUK",
-      "endpoints": ["https://github.com/Kc1t/alethe-agents/releases/latest/download/latest.json"],
+      "endpoints": ["https://github.com/grupoprosperyn8n/alethe-agents/releases/latest/download/latest.json"],
       "windows": {
         "installMode": "passive"
       }

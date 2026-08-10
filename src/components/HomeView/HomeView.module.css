@@ -991,15 +991,15 @@
   background: color-mix(in srgb, var(--agent-opencode) 16%, transparent);
   border-color: color-mix(in srgb, var(--agent-opencode) 28%, transparent);
 }
-.notifFreebuff {
-  color: var(--agent-freebuff);
-  background: color-mix(in srgb, var(--agent-freebuff) 16%, transparent);
-  border-color: color-mix(in srgb, var(--agent-freebuff) 28%, transparent);
+.notifHermes {
+  color: var(--agent-hermes);
+  background: color-mix(in srgb, var(--agent-hermes) 16%, transparent);
+  border-color: color-mix(in srgb, var(--agent-hermes) 28%, transparent);
 }
-.notifMimo {
-  color: var(--agent-mimo);
-  background: color-mix(in srgb, var(--agent-mimo) 16%, transparent);
-  border-color: color-mix(in srgb, var(--agent-mimo) 28%, transparent);
+.notifPi {
+  color: var(--agent-pi);
+  background: color-mix(in srgb, var(--agent-pi) 16%, transparent);
+  border-color: color-mix(in srgb, var(--agent-pi) 28%, transparent);
 }
 
 .notifBody {

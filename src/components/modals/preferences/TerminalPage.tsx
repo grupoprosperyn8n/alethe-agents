@@ -17,8 +17,8 @@ const AGENTS: { id: AgentType; label: string }[] = [
   { id: 'codex', label: 'Codex' },
   { id: 'antigravity', label: 'Antigravity' },
   { id: 'opencode', label: 'OpenCode' },
-  { id: 'freebuff', label: 'Freebuff' },
-  { id: 'mimo', label: 'Mimo Code' },
+  { id: 'hermes', label: 'Hermes' },
+  { id: 'pi', label: 'Pi CLI' },
 ]
 
 export function TerminalPage({ enabledCount }: { enabledCount: number }) {

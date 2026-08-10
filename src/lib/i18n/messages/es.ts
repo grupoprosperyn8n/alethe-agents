@@ -1,90 +1,90 @@
 /**
- * Fonte-de-verdade das mensagens da UI (inglês, default).
- * `MessageKey` é derivado daqui — `pt-BR.ts` é tipado como
- * `Record<MessageKey, string>`, então qualquer chave faltando vira erro de
- * compilação. Mantenha as chaves em ordem por namespace.
+ * Fuente de verdad de los mensajes de la UI (español, default).
+ * `MessageKey` se deriva de aquí — cualquier otra traducción debe tiparse como
+ * `Record<MessageKey, string>`, así que cualquier clave faltante genera error de
+ * compilación. Mantené las claves ordenadas por namespace.
  */
-export const en = {
+export const es = {
   /* ---- loading ---- */
-  'loading.initializing': 'Initializing workspace',
+  'loading.initializing': 'Inicializando workspace',
 
   /* ---- common ---- */
-  'common.back': 'Back',
-  'common.next': 'Next',
-  'common.start': 'Start',
-  'common.skip': 'Skip',
-  'common.close': 'Close',
-  'common.cancel': 'Cancel',
-  'common.save': 'Save',
-  'common.create': 'Create',
-  'common.remove': 'Remove',
-  'common.followUi': 'Follow UI',
+  'common.back': 'Atrás',
+  'common.next': 'Siguiente',
+  'common.start': 'Iniciar',
+  'common.skip': 'Omitir',
+  'common.close': 'Cerrar',
+  'common.cancel': 'Cancelar',
+  'common.save': 'Guardar',
+  'common.create': 'Crear',
+  'common.remove': 'Eliminar',
+  'common.followUi': 'Seguir UI',
   'common.errorPrefix': 'Error: {message}',
 
   /* ---- language ---- */
-  'language.title': 'Language',
-  'language.subtitle': 'Choose the interface language. You can change it later in Preferences.',
+  'language.title': 'Idioma',
+  'language.subtitle': 'Elegí el idioma de la interfaz. Podés cambiarlo después en Preferencias.',
 
   /* ---- onboarding ---- */
-  'onboarding.title': 'Create profile',
-  'onboarding.kicker': 'Quick setup',
-  'onboarding.subtitle': 'Four short steps. Direct, local, and easy to revisit later.',
-  'onboarding.localNote': 'Local only. Your profile stays on this device.',
-  'onboarding.step': 'Step {current} of {total}',
-  'onboarding.progressLabel': 'Setup progress',
-  'onboarding.profileStep': 'Profile',
-  'onboarding.profileStepHint': 'Language, name, and optional photo.',
-  'onboarding.themeStep': 'Theme',
-  'onboarding.themeStepHint': 'Pick the look you want first.',
-  'onboarding.agentsStep': 'Agents',
-  'onboarding.agentsStepHint': 'Enable only the ones you use.',
-  'onboarding.gitStep': 'Features',
-  'onboarding.gitStepHint': 'Keep only the tools you want visible.',
-  'onboarding.profileTitle': 'Profile',
+  'onboarding.title': 'Crear perfil',
+  'onboarding.kicker': 'Configuración rápida',
+  'onboarding.subtitle': 'Cuatro pasos cortos. Directo, local y fácil de revisar después.',
+  'onboarding.localNote': 'Solo local. Tu perfil queda en este dispositivo.',
+  'onboarding.step': 'Paso {current} de {total}',
+  'onboarding.progressLabel': 'Progreso de la configuración',
+  'onboarding.profileStep': 'Perfil',
+  'onboarding.profileStepHint': 'Idioma, nombre y foto opcional.',
+  'onboarding.themeStep': 'Tema',
+  'onboarding.themeStepHint': 'Elegí primero el look.',
+  'onboarding.agentsStep': 'Agentes',
+  'onboarding.agentsStepHint': 'Activá solo los que usás.',
+  'onboarding.gitStep': 'Funciones',
+  'onboarding.gitStepHint': 'Dejá visibles solo las herramientas que querés.',
+  'onboarding.profileTitle': 'Perfil',
   'onboarding.profileSubtitle':
-    'Set the language, then give the app a name and an avatar if you want one.',
-  'onboarding.profilePreviewHint': 'This is how your profile will show up in the app.',
-  'onboarding.name': 'Name',
-  'onboarding.namePlaceholder': 'Your name',
-  'onboarding.nameHint': 'Keep it short and recognizable.',
-  'onboarding.photoTitle': 'Photo',
-  'onboarding.photoShow': 'Add photo',
-  'onboarding.photoHide': 'Hide photo',
-  'onboarding.photoHint': 'Optional. Hidden until you expand it.',
-  'onboarding.languageEnglishHint': 'Use the interface in English.',
-  'onboarding.languagePortugueseHint': 'Use the interface in Portuguese.',
-  'onboarding.languageSpanishHint': 'Use the interface in Spanish.',
-  'onboarding.themeTitle': 'Pick a theme',
+    'Definí el idioma, después dale un nombre y un avatar si querés.',
+  'onboarding.profilePreviewHint': 'Así se va a ver tu perfil en la app.',
+  'onboarding.name': 'Nombre',
+  'onboarding.namePlaceholder': 'Tu nombre',
+  'onboarding.nameHint': 'Corto y fácil de reconocer.',
+  'onboarding.photoTitle': 'Foto',
+  'onboarding.photoShow': 'Agregar foto',
+  'onboarding.photoHide': 'Ocultar foto',
+  'onboarding.photoHint': 'Opcional. Oculta hasta que la expandas.',
+  'onboarding.languageEnglishHint': 'Usar la interfaz en inglés.',
+  'onboarding.languagePortugueseHint': 'Usar la interfaz en portugués.',
+  'onboarding.languageSpanishHint': 'Usar la interfaz en español.',
+  'onboarding.themeTitle': 'Elegí un tema',
   'onboarding.themeSubtitle':
-    'Choose the palette that fits the room first. You can change it later.',
-  'onboarding.agentsTitle': 'Agents',
-  'onboarding.agentsSubtitle': 'Pick the agents that should be enabled from day one.',
-  'onboarding.agentsCount': '{count} enabled',
-  'onboarding.agentsCountHint': 'Leave at least one active to continue.',
-  'onboarding.agentsDetecting': 'Detecting installed CLIs…',
-  'onboarding.agentsDetected': 'Installed CLIs were selected automatically.',
-  'onboarding.agentChecking': 'Checking',
-  'onboarding.agentNotInstalled': 'Not installed',
-  'onboarding.gitTitle': 'Git source control',
+    'Elegí la paleta que mejor se adapte. Después podés cambiarla.',
+  'onboarding.agentsTitle': 'Agentes',
+  'onboarding.agentsSubtitle': 'Elegí los agentes que deberían estar activos desde el primer día.',
+  'onboarding.agentsCount': '{count} activos',
+  'onboarding.agentsCountHint': 'Dejá al menos uno activo para continuar.',
+  'onboarding.agentsDetecting': 'Detectando CLIs instalados…',
+  'onboarding.agentsDetected': 'Los CLIs instalados se seleccionaron automáticamente.',
+  'onboarding.agentChecking': 'Verificando',
+  'onboarding.agentNotInstalled': 'No instalado',
+  'onboarding.gitTitle': 'Control de versiones Git',
   'onboarding.gitSubtitle':
-    'Show repository changes, stage files, and create commits without leaving Alethe.',
-  'onboarding.gitEnable': 'Show Git Control',
-  'onboarding.gitEnableDesc': 'Add the Source Control tab to the sidebar.',
-  'onboarding.gitDisable': 'Keep it hidden',
-  'onboarding.gitDisableDesc': 'You can enable it later in Preferences.',
-  'onboarding.featuresTitle': 'Choose your features',
+    'Mostrá cambios del repo, prepará archivos y creá commits sin salir de SO Multi Agente.',
+  'onboarding.gitEnable': 'Mostrar control Git',
+  'onboarding.gitEnableDesc': 'Agrega la pestaña Source Control a la sidebar.',
+  'onboarding.gitDisable': 'Mantener oculto',
+  'onboarding.gitDisableDesc': 'Podés activarlo después en Preferencias.',
+  'onboarding.featuresTitle': 'Elegí tus funciones',
   'onboarding.featuresSubtitle':
-    'Start focused. You can change these modules at any time in Preferences.',
-  'onboarding.footerNote': 'The setup is local and can be changed later in Preferences.',
-  'onboarding.finish': 'Finish setup',
+    'Empezá enfocado. Podés cambiar estos módulos cuando quieras en Preferencias.',
+  'onboarding.footerNote': 'La configuración es local y se puede cambiar después en Preferencias.',
+  'onboarding.finish': 'Finalizar configuración',
 
   /* ---- agents ---- */
   'agent.shell.desc': 'PowerShell · cmd · bash',
   'agent.claude.desc': 'Anthropic CLI',
   'agent.codex.desc': 'OpenAI CLI',
   'agent.opencode.desc': 'Open source',
-  'agent.hermes.desc': 'Multi-platform messaging bridge',
-  'agent.pi.desc': 'Utility CLI for search and analysis',
+  'agent.hermes.desc': 'Puente de mensajería multiplataforma',
+  'agent.pi.desc': 'CLI de utilidades para búsqueda y análisis',
   'agent.antigravity.desc': 'Google Antigravity CLI',
 
   /* ---- image input ---- */
@@ -1693,4 +1693,4 @@ export const en = {
   'merge.reviewFeedbackSentBody': 'Your message was sent to the reviewer agent in its terminal.',
 } as const
 
-export type MessageKey = keyof typeof en
+export type MessageKey = keyof typeof es
