@@ -1,6 +1,6 @@
 [package]
 name = "so-multi-agente"
-version = "0.1.1"
+version = "0.1.0"
 description = "SO Multi Agente — orquestador multi-agente de escritorio"
 authors = ["Sistemas Agenticos"]
 
