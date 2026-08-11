@@ -60,8 +60,8 @@ export function AppearancePage() {
           ariaLabel={t('prefs.appIconThemeAria')}
           options={[
             ...THEME_OPTIONS.map((theme) => ({ value: theme.id, label: themeLabel(t, theme.id) })),
-            { value: 'alethe-blue-gradient', label: 'Alethe Blue Gradient' },
-            { value: 'alethe-pink-gradient', label: 'Alethe Pink Gradient' },
+            { value: 'alethe-blue-gradient', label: 'Blue Gradient' },
+            { value: 'alethe-pink-gradient', label: 'Pink Gradient' },
           ]}
         />
       </SettingsSection>

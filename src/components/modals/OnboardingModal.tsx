@@ -2,7 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { BrainCircuit, Check, GitBranch, Globe, ListTodo, Network } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
-import aletheLogo from '../../assets/alethe-logo.png'
+import soMultiAgenteLogo from '../../assets/so-multi-agente-logo.png'
 import { FEATURES } from '../../lib/features'
 import { LOCALES, useT } from '../../lib/i18n'
 import { DEFAULT_PROFILE_IMAGE_URL, getProfileInitial } from '../../lib/profile'
@@ -184,8 +184,8 @@ export function OnboardingModal() {
                 <div className={styles.compactBrand}>
                   <img
                     className={styles.brandLogo}
-                    src={aletheLogo}
-                    alt="Alethe"
+                    src={soMultiAgenteLogo}
+                    alt="SO Multi Agente"
                     draggable={false}
                   />
                   <div>

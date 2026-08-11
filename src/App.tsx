@@ -98,7 +98,7 @@ function LoadingScreen() {
         />
       </div>
       <div className={styles.loadingInner}>
-        <div className={styles.loadingWordmark}>Alethe</div>
+        <div className={styles.loadingWordmark}>SO Multi Agente</div>
         <div className={styles.loadingConsole}>
           <span className={styles.loadingPrompt} aria-hidden="true">
             ›
