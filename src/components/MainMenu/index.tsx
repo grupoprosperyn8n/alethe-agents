@@ -186,7 +186,7 @@ export function MainMenu() {
           void action(async () => {
             const target = await saveFile({
               title: t('menu.exportBackupTitle'),
-              defaultPath: `alethe-backup-${new Date().toISOString().slice(0, 10)}.alethe.zip`,
+              defaultPath: `so-multi-agente-backup-${new Date().toISOString().slice(0, 10)}.zip`,
               filters: [{ name: t('menu.backupFilter'), extensions: ['zip'] }],
             })
             if (target) await exportBackup(target)
