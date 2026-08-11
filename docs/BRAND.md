@@ -1,4 +1,4 @@
-# Alethe Brand and Design Tokens
+# SO Multi Agente Brand and Design Tokens
 
 This file documents the public app assets and the core design tokens used by the interface.
 
@@ -111,4 +111,4 @@ Common usage:
 
 ## Trademark
 
-The Alethe name, logo, and official branding are reserved for official builds. See [TRADEMARK.md](../TRADEMARK.md).
+The SO Multi Agente name, logo, and official branding are reserved for official builds. See [TRADEMARK.md](../TRADEMARK.md).

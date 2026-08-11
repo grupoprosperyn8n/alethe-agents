@@ -2,7 +2,7 @@
 
 Workspace de escritorio local-first para coordinar múltiples agentes de código y terminales reales en paralelo.
 
-Basado en [Alethe](https://github.com/Kc1t/alethe-agents) de Kauã Miguel.
+Basado en el proyecto upstream [alethe-agents](https://github.com/Kc1t/alethe-agents) de Kauã Miguel.
 
 ## Agentes soportados
 
@@ -33,4 +33,4 @@ npm test         # tests unitarios
 
 ## Créditos
 
-Fork y adaptación de [Alethe](https://github.com/Kc1t/alethe-agents) por Kauã Miguel.
+Fork y adaptación del proyecto upstream [alethe-agents](https://github.com/Kc1t/alethe-agents) por Kauã Miguel.

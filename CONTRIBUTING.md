@@ -1,6 +1,6 @@
-# Contributing to Alethe
+# Contributing to SO Multi Agente
 
-Thanks for being here. Alethe is a small project with a real user base, and outside
+Thanks for being here. SO Multi Agente is a small project with a real user base, and outside
 contributions have shipped some of its best features — the in-app updater, mouse scroll inside
 TUIs, Linux CLI detection, the Git diff explorer. Yours can be next.
 
@@ -37,7 +37,7 @@ Roughly ordered from "you can do this today" to "talk to us first":
    don't need to understand the whole app to finish one.
 2. **Report a bug** with steps to reproduce, your OS, and the app version. A good bug report is
    a real contribution — several fixes here started as one.
-3. **Validate a platform.** Alethe is Windows-first and still under-tested on Linux and macOS.
+3. **Validate a platform.** SO Multi Agente is Windows-first and still under-tested on Linux and macOS.
    Running it on your machine and reporting exactly what broke is genuinely useful.
 4. **Improve docs, screenshots, or setup notes.** If something confused you during setup, you're
    the best-positioned person in the world to fix it. See the [theme guide](docs/THEMES.md) for adding or documenting themes.
@@ -191,7 +191,7 @@ fails `npm run build`. Never hardcode user-facing text in a component.
 
 **2. Colors and spacing come from tokens — never literals.**
 Use the CSS custom properties in `src/styles/theme.css` (`--bg`, `--fg`, `--accent`, `--border`,
-`--status-working`, …). Alethe ships 12 themes; a hardcoded `#10b981` looks right in dark mode and
+`--status-working`, …). SO Multi Agente ships 12 themes; a hardcoded `#10b981` looks right in dark mode and
 wrong in the other eleven. No gradients.
 
 **3. One `.module.css` per component.**
@@ -234,7 +234,7 @@ resource in this project.
 
 - What changed and why, in a couple of sentences.
 - `Closes #123` if it resolves an issue.
-- **Before/after screenshots or a GIF for any UI change.** Not optional — Alethe is a visual app
+- **Before/after screenshots or a GIF for any UI change.** Not optional — SO Multi Agente is a visual app
   and this is often the fastest way to get a yes.
 - Which OS you tested on. "Windows only, untested on macOS" is a perfectly good thing to write,
   and far better than silence.
@@ -259,7 +259,7 @@ for it — you don't have to do anything).
 ## Troubleshooting
 
 **Windows Defender deletes the binary you just built.**
-Alethe spawns processes and creates PTYs from an unsigned binary, which trips Defender's ML
+SO Multi Agente spawns processes and creates PTYs from an unsigned binary, which trips Defender's ML
 heuristic (`Trojan:Win32/Bearfoos.A!ml`). It's a false positive. Add an exclusion for
 `src-tauri/target` — otherwise your dev builds get quarantined mid-work. See the README for
 details.
@@ -282,6 +282,6 @@ The Rust backend compiles from scratch the first time. Grab a coffee; it's cache
 
 ## License
 
-Alethe is licensed under **AGPL-3.0-or-later**. By contributing, you agree that your contribution
-is licensed under the same terms. The **Alethe** name, logo, and branding are reserved for
+SO Multi Agente is licensed under **AGPL-3.0-or-later**. By contributing, you agree that your contribution
+is licensed under the same terms. The **SO Multi Agente** name, logo, and branding are reserved for
 official builds — see [`TRADEMARK.md`](TRADEMARK.md).
