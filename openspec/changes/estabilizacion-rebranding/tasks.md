@@ -95,3 +95,16 @@ Chain strategy: pending
 **Definition of done**: all suites green; dry-run passes on clean tree; 0 un-excluded grep hits; mark task checkboxes; report for verify phase.
 
 **estimated_lines**: ~5
+
+## Status (updated by sdd-apply)
+
+All 8 tasks complete — 2026-08-11:
+
+- [x] 1.1 (T1) — Extract pure release lib + vitest tests
+- [x] 1.2 (T2) — stats.rs pure classifier + Rust tests
+- [x] 2.1 (T3) — i18n values (en/es/pt-BR)
+- [x] 2.2 (T4) — UI wordmark, modals, assets
+- [x] 2.3 (T5) — Remote web surface
+- [x] 2.4 (T6) — Rust backend user-visible strings
+- [x] 2.5 (T7) — Workflow + docs
+- [x] 3.1 (T8) — Full verification + residual grep
