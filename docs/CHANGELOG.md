@@ -1,6 +1,6 @@
 # Changelog
 
-Mudanças relevantes do **Alethe** para quem usa o app. Formato inspirado em
+Mudanças relevantes do **SO Multi Agente** para quem usa o app. Formato inspirado em
 [Keep a Changelog](https://keepachangelog.com/pt-BR/); versionamento semântico
 ([SemVer](https://semver.org/lang/pt-BR/)). Datas em UTC.
 
@@ -12,11 +12,14 @@ Mudanças relevantes do **Alethe** para quem usa o app. Formato inspirado em
 
 ### Alterado
 
+- **Rebranding completo de "Alethe" para "SO Multi Agente"** em toda a superfície user-visible: UI (wordmark, WelcomeModal, OnboardingModal + logo renomeado, backup dos perfis, labels de gradiente), i18n en/es/pt-BR (~110 strings), superfície web remota (index.html, manifest, app.js), strings do backend Rust (título da janela, GitHub sync, Discord presence, briefing de clones, Spotify, codex/antigravity, template de Todo) e documentação (README, CONTRIBUTING, SHOWCASE, docs/*, release workflow). Contratos de persistência (`.alethe/`, eventos `alethe:*`, themeIcons values, env `ALETHE_*`, CLI `alethe`, `home.quickTerminalTitle`) ficam intactos.
 - Added a live Remote Control device counter to the topbar, with direct access to the connection panel.
 - **A borda arco-íris agora é o indicador de foco de qualquer container da workspace, não só um efeito de cor de projeto.** Antes, só containers com a cor "arco-íris" escolhida no projeto mostravam o anel animado, sempre visível independente de foco. Agora qualquer container mostra a borda arco-íris enquanto estiver em foco (um terminal dele com o cursor/digitação ativa); sem foco, volta à borda normal por cor de projeto.
 
 ### Corrigido
 
+- **`release.mjs` não achava o crate renomeado no Cargo.lock.** A regex procurava `name = "alethe"` e o crate agora é `so-multi-agente`; o bump falhava depois de já ter reescrito package.json/tauri.conf.json/Cargo.toml (estado parcial). Agora as 4 fontes de versão são validadas ANTES de escrever qualquer arquivo (`scripts/release-lib.mjs`, coberto por 15 testes vitest).
+- **`app_bytes` não incluía o binário próprio depois do rename.** O filtro de processos procurava `alethe` no nome; agora o nome esperado é derivado de `current_exe()` em runtime com match exato (`so-multi-agente`), garantindo `app_bytes > 0` com o app rodando e excluindo processos legacy `alethe` (coberto por 7 testes unitários).
 - **Colar imagem ou arquivos no terminal não fazia nada no Linux, silenciosamente.** `read_clipboard_payload` (que detecta uma imagem/arquivo copiado e cola como caminho, em vez de descartar o conteúdo do clipboard) só tinha implementação no Windows; em qualquer outra plataforma retornava erro na hora, sem feedback nenhum e sem cair pro texto puro (colar texto puro passa por outro caminho de código, por isso passou despercebido). Colar texto sempre funcionou. Implementado um backend Linux/BSD via `wl-paste`/`wl-copy` (Wayland) ou `xclip` (X11): screenshots, imagens copiadas da web (`image/png`) e arquivos copiados num gerenciador de arquivos (`text/uri-list`) agora funcionam igual ao Windows. macOS continua sem implementação.
 - **Clonar um repositório do GitHub só funcionava em máquinas com uma pasta `D:\Projetos`.** O destino do clone estava fixo no código, então em qualquer outro disco — e em Linux/macOS — o clone falhava. Agora a pasta escolhida no formulário é usada como destino e, se nenhuma for escolhida, o clone vai para `~/Alethe/<repositório>`; o nome da pasta sai da URL do repositório, como o próprio `git clone` faria.
 - Removido o caminho de renderização WebGL dos terminais, que já estava desativado no código mas continuava carregado como dependência. Os terminais seguem no renderizador Canvas 2D, sem mudança de comportamento.
