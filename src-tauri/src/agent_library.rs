@@ -4,7 +4,11 @@ use serde::Serialize;
 use std::fs;
 use std::path::PathBuf;
 
-const MARKER: &str = "gerado pelo Alethe";
+const MARKER: &str = "generado por Alethe";
+
+/// Marcador legado (português) — archivos instalados por versiones anteriores
+/// del app se siguen reconociendo como propios de Alethe.
+const LEGACY_MARKER: &str = "gerado pelo Alethe";
 
 #[derive(Serialize)]
 pub struct InstalledAgent {
@@ -41,7 +45,7 @@ fn list_installed_agents_inner(folder: String) -> Vec<InstalledAgent> {
             }
             let name = path.file_stem()?.to_str()?.to_string();
             let from_alethe = fs::read_to_string(&path)
-                .map(|c| c.contains(MARKER))
+                .map(|c| c.contains(MARKER) || c.contains(LEGACY_MARKER))
                 .unwrap_or(false);
             Some(InstalledAgent { name, from_alethe })
         })
@@ -59,22 +63,22 @@ pub fn install_agent(
     force: bool,
 ) -> Result<String, String> {
     if name.is_empty() || name.contains(['/', '\\', '.']) {
-        return Err(format!("nome de agent inválido: {name}"));
+        return Err(format!("nombre de agente inválido: {name}"));
     }
     let dir = agents_dir(&folder);
-    fs::create_dir_all(&dir).map_err(|e| format!("criar {}: {e}", dir.display()))?;
+    fs::create_dir_all(&dir).map_err(|e| format!("crear {}: {e}", dir.display()))?;
     let path = dir.join(format!("{name}.md"));
 
     if path.exists() && !force {
         let ours = fs::read_to_string(&path)
-            .map(|c| c.contains(MARKER))
+            .map(|c| c.contains(MARKER) || c.contains(LEGACY_MARKER))
             .unwrap_or(false);
         if !ours {
             return Err("conflict".to_string());
         }
     }
 
-    fs::write(&path, content).map_err(|e| format!("escrever {}: {e}", path.display()))?;
+    fs::write(&path, content).map_err(|e| format!("escribir {}: {e}", path.display()))?;
     eprintln!("[agent_library] instalado {}", path.display());
     Ok(path.to_string_lossy().to_string())
 }
@@ -83,19 +87,19 @@ pub fn install_agent(
 #[tauri::command]
 pub fn uninstall_agent(folder: String, name: String, force: bool) -> Result<(), String> {
     if name.is_empty() || name.contains(['/', '\\', '.']) {
-        return Err(format!("nome de agent inválido: {name}"));
+        return Err(format!("nombre de agente inválido: {name}"));
     }
     let path = agents_dir(&folder).join(format!("{name}.md"));
     if !path.exists() {
         return Ok(());
     }
     let ours = fs::read_to_string(&path)
-        .map(|c| c.contains(MARKER))
+        .map(|c| c.contains(MARKER) || c.contains(LEGACY_MARKER))
         .unwrap_or(false);
     if !ours && !force {
         return Err("not-ours".to_string());
     }
-    fs::remove_file(&path).map_err(|e| format!("remover {}: {e}", path.display()))?;
+    fs::remove_file(&path).map_err(|e| format!("eliminar {}: {e}", path.display()))?;
     eprintln!("[agent_library] removido {}", path.display());
     Ok(())
 }

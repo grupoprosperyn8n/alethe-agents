@@ -113,22 +113,22 @@ type MergeState = {
   reset: () => void
 }
 
-/** Prompt inicial do agente efêmero — escopo travado, aponta pro arquivo de contexto. */
+/** Prompt inicial del agente efímero — alcance fijado, apunta al archivo de contexto. */
 function conflictPrompt(): string {
   return (
-    'Leia o arquivo ALETHE_CONFLICT.md neste diretório e resolva SOMENTE os conflitos ' +
-    'de merge listados nele, preservando a intenção das duas branches. Não implemente ' +
-    'funcionalidades, não commite — apenas salve os arquivos resolvidos e avise quando terminar.'
+    'Lee el archivo ALETHE_CONFLICT.md en este directorio y resuelve SOLO los conflictos ' +
+    'de merge listados en él, preservando la intención de las dos ramas. No implementes ' +
+    'funcionalidades, no hagas commit — solo guarda los archivos resueltos y avisa cuando termines.'
   )
 }
 
-/** Prompt de retry — o agente novo não tem memória da tentativa anterior, então o motivo da falha precisa ir no prompt. */
+/** Prompt de retry — el agente nuevo no tiene memoria del intento anterior, así que el motivo del fallo debe ir en el prompt. */
 function retryPrompt(failureContext: string): string {
   return (
-    'A tentativa anterior de resolver este conflito falhou. Leia o arquivo ALETHE_CONFLICT.md ' +
-    'neste diretório de novo e corrija o problema abaixo, preservando a intenção das duas ' +
-    'branches. Não implemente funcionalidades, não commite — apenas salve os arquivos e avise ' +
-    'quando terminar.\n\nMotivo da falha anterior:\n' +
+    'El intento anterior de resolver este conflicto falló. Lee de nuevo el archivo ALETHE_CONFLICT.md ' +
+    'en este directorio y corrige el problema de abajo, preservando la intención de las dos ' +
+    'ramas. No implementes funcionalidades, no hagas commit — solo guarda los archivos y avisa ' +
+    'cuando termines.\n\nMotivo del fallo anterior:\n' +
     failureContext.slice(0, 2000)
   )
 }

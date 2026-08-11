@@ -1,18 +1,6 @@
 export type AgentType =
   'shell' | 'claude' | 'codex' | 'opencode' | 'antigravity' | 'hermes' | 'pi'
 
-/** Rótulo de exibição de cada agente — fonte única, evita listas paralelas
- * divergentes por componente (ex.: "Claude" vs "Claude Code" pro mesmo tipo). */
-export const AGENT_TYPE_LABELS: Record<AgentType, string> = {
-  claude: 'Claude Code',
-  codex: 'Codex',
-  antigravity: 'Antigravity',
-  opencode: 'OpenCode',
-  hermes: 'Hermes',
-  pi: 'Pi CLI',
-  shell: 'Shell',
-}
-
 /** Ordem canônica de exibição dos tipos de agente — fonte única, evita duas
  * listas paralelas divergindo (ex.: posición del Shell diferente entre el
  * selector de nuevo terminal y el de agente de conflicto). */

@@ -14,46 +14,50 @@ use std::path::PathBuf;
 
 /// Marca de autoria — só deletamos no toggle-off arquivos que contêm isso,
 /// pra nunca apagar um agent que o usuário criou por conta própria.
-const MARKER: &str = "gerado pelo Alethe (modo economia)";
+const MARKER: &str = "generado por Alethe (modo economía)";
+
+/// Marcador legado (português) — arquivos escritos por versões anteriores do
+/// app continuam sendo reconhecidos como nossos no toggle-off.
+const LEGACY_MARKER: &str = "gerado pelo Alethe (modo economia)";
 
 const AGENTS: &[(&str, &str)] = &[
     (
         "haiku-resumidor.md",
         r#"---
 name: haiku-resumidor
-description: MUST BE USED para resumir arquivos, extrair informação específica, classificar conteúdo e varrer logs. Use proativamente sempre que precisar ler muito conteúdo e só o resumo ou um dado pontual importar.
+description: MUST BE USED para resumir archivos, extraer información específica, clasificar contenido y revisar logs. Úsalo de forma proactiva siempre que necesites leer mucho contenido y solo importen el resumen o un dato puntual.
 model: haiku
 tools: Read, Grep, Glob
 ---
 
-Você é um worker de leitura barato. Sua única função é ler muito e devolver pouco.
+Eres un worker de lectura barato. Tu única función es leer mucho y devolver poco.
 
-Regras:
-- Responda SEMPRE em formato curto e estruturado: bullets, no máximo ~150 palavras.
-- Nunca cole trechos longos do conteúdo lido; extraia só o que foi pedido.
-- Se a tarefa pedir um dado específico (número, nome, path), devolva só ele.
-- Não tome decisões de arquitetura nem sugira refactors — só reporte fatos.
+Reglas:
+- Responde SIEMPRE en formato corto y estructurado: bullets, como máximo ~150 palabras.
+- Nunca pegues fragmentos largos del contenido leído; extrae solo lo pedido.
+- Si la tarea pide un dato específico (número, nombre, path), devuelve solo eso.
+- No tomes decisiones de arquitectura ni sugieras refactors — solo reporta hechos.
 
-<!-- gerado pelo Alethe (modo economia) — seguro deletar -->
+<!-- generado por Alethe (modo economía) — seguro eliminar -->
 "#,
     ),
     (
         "haiku-mecanico.md",
         r#"---
 name: haiku-mecanico
-description: MUST BE USED para tarefas mecânicas de edição - gerar boilerplate, renomear símbolos, formatar, aplicar a mesma mudança repetitiva em vários arquivos. Use proativamente quando a tarefa for braçal, bem especificada e não exigir decisão de design.
+description: MUST BE USED para tareas mecánicas de edición - generar boilerplate, renombrar símbolos, formatear, aplicar el mismo cambio repetitivo en varios archivos. Úsalo de forma proactiva cuando la tarea sea manual, esté bien especificada y no exija decisión de diseño.
 model: haiku
 tools: Read, Edit, Write, Grep, Glob
 ---
 
-Você é um worker mecânico barato. Executa edições braçais exatamente como especificado.
+Eres un worker mecánico barato. Ejecutas ediciones manuales exactamente como se especifican.
 
-Regras:
-- Siga a especificação à risca; não "melhore" nada por conta própria.
-- Em caso de ambiguidade, pare e devolva a dúvida em uma linha em vez de adivinhar.
-- Resposta final: lista curta de arquivos tocados + uma linha do que mudou em cada.
+Reglas:
+- Sigue la especificación al pie de la letra; no "mejores" nada por cuenta propia.
+- En caso de ambigüedad, detente y devuelve la duda en una línea en lugar de adivinar.
+- Respuesta final: lista corta de archivos tocados + una línea de qué cambió en cada uno.
 
-<!-- gerado pelo Alethe (modo economia) — seguro deletar -->
+<!-- generado por Alethe (modo economía) — seguro eliminar -->
 "#,
     ),
     (
@@ -62,7 +66,7 @@ Regras:
         // do próprio agent bloqueia (exit 2) qualquer Bash que não seja
         // `codex exec`, devolvendo o motivo pro modelo tentar de novo certo.
         "codex-only-guard.cjs",
-        r#"// gerado pelo Alethe (modo economia) — guard do codex-executor
+        r#"// generado por Alethe (modo economía) — guard del codex-executor
 let raw = ''
 process.stdin.on('data', (d) => (raw += d))
 process.stdin.on('end', () => {
@@ -71,7 +75,7 @@ process.stdin.on('end', () => {
     cmd = JSON.parse(raw).tool_input.command || ''
   } catch {}
   if (!/^\s*codex\s+exec\b/.test(cmd)) {
-    console.error('Bloqueado: o codex-executor só pode rodar `codex exec ...`. Monte a tarefa como instrução autocontida e delega pro codex.')
+    console.error('Bloqueado: el codex-executor solo puede ejecutar `codex exec ...`. Arma la tarea como instrucción autocontenida y delégala a codex.')
     process.exit(2)
   }
 })
@@ -81,7 +85,7 @@ process.stdin.on('end', () => {
         "codex-executor.md",
         r#"---
 name: codex-executor
-description: EXPERIMENTAL - use para execução longa e barulhenta onde só o resumo importa - rodar suites de teste, builds demorados, aplicar um fix mecânico e verificar. O trabalho pesado roda no Codex CLI (GPT), fora do orçamento de tokens do Claude.
+description: EXPERIMENTAL - úsalo para ejecución larga y ruidosa donde solo importa el resumen - ejecutar suites de tests, builds demorados, aplicar un fix mecánico y verificar. El trabajo pesado corre en el Codex CLI (GPT), fuera del presupuesto de tokens de Claude.
 model: haiku
 tools: Bash
 hooks:
@@ -92,14 +96,14 @@ hooks:
           command: node .claude/agents/codex-only-guard.cjs
 ---
 
-Você é um proxy pro Codex CLI. O ÚNICO comando Bash que você está autorizado a rodar é `codex exec`. Rodar qualquer outro comando (find, grep, cat, npm, cargo…) é uma violação — mesmo que a tarefa pareça trivial, ela DEVE ir pro codex.
+Eres un proxy para el Codex CLI. El ÚNICO comando Bash que estás autorizado a ejecutar es `codex exec`. Ejecutar cualquier otro comando (find, grep, cat, npm, cargo…) es una violación — aunque la tarea parezca trivial, DEBE ir a codex.
 
-Como operar:
-1. Monte a tarefa como uma instrução autocontida em inglês (o codex não vê esta conversa).
-2. Rode: `codex exec --skip-git-repo-check "<instrução>"`.
-3. Devolva APENAS: resultado em até 5 bullets + o que falhou, se falhou. Nunca cole a saída bruta inteira.
+Cómo operar:
+1. Arma la tarea como una instrucción autocontenida en español (codex no ve esta conversación).
+2. Ejecuta: `codex exec --skip-git-repo-check "<instrucción>"`.
+3. Devuelve SOLO: resultado en hasta 5 bullets + lo que falló, si falló. Nunca pegues la salida cruda completa.
 
-<!-- gerado pelo Alethe (modo economia) — seguro deletar -->
+<!-- generado por Alethe (modo economía) — seguro eliminar -->
 "#,
     ),
 ];
@@ -122,10 +126,10 @@ pub fn set_economy_agents(folder: String, enabled: bool) -> Result<Vec<String>, 
     let mut touched = Vec::new();
 
     if enabled {
-        fs::create_dir_all(&dir).map_err(|e| format!("criar {}: {e}", dir.display()))?;
+        fs::create_dir_all(&dir).map_err(|e| format!("crear {}: {e}", dir.display()))?;
         for (name, body) in AGENTS {
             let path = dir.join(name);
-            fs::write(&path, body).map_err(|e| format!("escrever {}: {e}", path.display()))?;
+            fs::write(&path, body).map_err(|e| format!("escribir {}: {e}", path.display()))?;
             touched.push(path.to_string_lossy().to_string());
         }
         eprintln!(
@@ -137,10 +141,10 @@ pub fn set_economy_agents(folder: String, enabled: bool) -> Result<Vec<String>, 
         for (name, _) in AGENTS {
             let path = dir.join(name);
             let ours = fs::read_to_string(&path)
-                .map(|c| c.contains(MARKER))
+                .map(|c| c.contains(MARKER) || c.contains(LEGACY_MARKER))
                 .unwrap_or(false);
             if ours {
-                fs::remove_file(&path).map_err(|e| format!("remover {}: {e}", path.display()))?;
+                fs::remove_file(&path).map_err(|e| format!("eliminar {}: {e}", path.display()))?;
                 touched.push(path.to_string_lossy().to_string());
             }
         }

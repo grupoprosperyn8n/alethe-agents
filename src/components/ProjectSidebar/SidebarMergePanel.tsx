@@ -27,12 +27,12 @@ import styles from './SidebarMergePanel.module.css'
  *  avalia e responde ao usuário no próprio terminal. */
 function reviewPrompt(branch: string, target: string): string {
   return (
-    `Revise as alterações da branch "${branch}" antes de um merge para "${target}". ` +
-    `Rode \`git diff ${target}...HEAD\` neste diretório pra ver o diff completo. ` +
-    'Aponte problemas reais (bugs, quebra de contrato, falta de tratamento de erro, ' +
-    'inconsistência com o resto do código) — não implemente nada, não corrija nada sozinho, ' +
-    'só avalie e explique. O usuário pode te responder aqui no terminal com pedidos de ajuste; ' +
-    'quando achar que está tudo certo, diga isso explicitamente.'
+    `Revisa los cambios de la rama "${branch}" antes de un merge hacia "${target}". ` +
+    `Ejecuta \`git diff ${target}...HEAD\` en este directorio para ver el diff completo. ` +
+    'Señala problemas reales (bugs, quiebre de contrato, falta de manejo de errores, ' +
+    'inconsistencia con el resto del código) — no implementes nada, no corrijas nada por tu cuenta, ' +
+    'solo evalúa y explica. El usuario puede responderte aquí en el terminal con pedidos de ajuste; ' +
+    'cuando creas que todo está bien, dilo explícitamente.'
   )
 }
 

@@ -99,17 +99,17 @@ fn emit(event_type: &str, meta: &MergeMeta, data: serde_json::Value) {
 
 fn build_prompt(meta: &MergeMeta, conflicts: &[ConflictFile]) -> String {
     let mut lines = vec![
-        "# Resolução de conflito de merge (Alethe)".to_string(),
+        "# Resolución de conflicto de merge (Alethe)".to_string(),
         String::new(),
-        format!("Merge de `{}` para `{}`. Este diretório é um ambiente EFÊMERO só para esta integração.", meta.source, meta.target),
+        format!("Merge de `{}` hacia `{}`. Este directorio es un entorno EFÍMERO solo para esta integración.", meta.source, meta.target),
         String::new(),
-        "## Regras (escopo travado)".to_string(),
-        "- Resolva SOMENTE os conflitos listados abaixo. Nada além disso.".to_string(),
-        "- NUNCA implemente funcionalidades, mude requisitos ou arquitetura.".to_string(),
-        "- Preserve a intenção das DUAS branches; confirme que nada se perdeu.".to_string(),
-        "- Ao terminar, apenas salve os arquivos resolvidos (sem commit — o Alethe commita após validar).".to_string(),
+        "## Reglas (alcance fijado)".to_string(),
+        "- Resuelva SOLAMENTE los conflictos listados abajo. Nada más.".to_string(),
+        "- NUNCA implemente funcionalidades, cambie requisitos ni arquitectura.".to_string(),
+        "- Preserve la intención de las DOS ramas; confirme que nada se pierde.".to_string(),
+        "- Al terminar, solo guarde los archivos resueltos (sin commit — Alethe hace el commit después de validar).".to_string(),
         String::new(),
-        "## Arquivos em conflito".to_string(),
+        "## Archivos en conflicto".to_string(),
     ];
     for conflict in conflicts {
         lines.push(format!(
@@ -120,7 +120,7 @@ fn build_prompt(meta: &MergeMeta, conflicts: &[ConflictFile]) -> String {
         ));
     }
     lines.push(String::new());
-    lines.push("Use `git diff` neste diretório para ver os marcadores (`<<<<<<<`/`>>>>>>>`).".to_string());
+    lines.push("Use `git diff` en este directorio para ver los marcadores (`<<<<<<<`/`>>>>>>>`).".to_string());
     lines.join("\n")
 }
 
@@ -141,7 +141,7 @@ pub async fn merge_prepare(
 ) -> Result<ConflictEnv, String> {
     tokio::task::spawn_blocking(move || merge_prepare_inner(repo, source, target, project_id))
         .await
-        .map_err(|error| format!("merge_prepare: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("merge_prepare: fallo en la tarea bloqueante: {error}"))?
 }
 
 pub(crate) fn merge_prepare_inner(
@@ -249,7 +249,7 @@ pub async fn merge_finalize(
 ) -> Result<MergeOutcome, String> {
     tokio::task::spawn_blocking(move || merge_finalize_inner(repo, env_id, validation_commands))
         .await
-        .map_err(|error| format!("merge_finalize: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("merge_finalize: fallo en la tarea bloqueante: {error}"))?
 }
 
 pub(crate) fn merge_finalize_inner(
@@ -275,7 +275,7 @@ pub(crate) fn merge_finalize_inner(
         return Ok(MergeOutcome {
             merged: false,
             stage: "conflict_markers".to_string(),
-            output: format!("Marcadores de conflito restantes em: {}", markers.join(", ")),
+            output: format!("Marcadores de conflicto restantes en: {}", markers.join(", ")),
             ..Default::default()
         });
     }
@@ -287,7 +287,7 @@ pub(crate) fn merge_finalize_inner(
             return Ok(MergeOutcome {
                 merged: false,
                 stage: "unmerged".to_string(),
-                output: format!("Arquivos não resolvidos: {}", still.join(", ")),
+                output: format!("Archivos sin resolver: {}", still.join(", ")),
                 ..Default::default()
             });
         }
@@ -341,7 +341,7 @@ pub(crate) fn merge_finalize_inner(
             merged: false,
             stage: "target_not_checked_out".to_string(),
             output: format!(
-                "O branch alvo '{}' não está checked out no repositório (atual: '{}'). Faça checkout e finalize de novo.",
+                "La rama objetivo '{}' no está en checkout en el repositorio (actual: '{}'). Realiza checkout y finaliza de nuevo.",
                 meta.target, head
             ),
             ..Default::default()
@@ -354,7 +354,13 @@ pub(crate) fn merge_finalize_inner(
         // mensagem (variações de caixa) especificamente pra ff-only recusado
         // por divergência, não por corrupção ou I/O.
         let lower = error.to_lowercase();
-        let stage = if lower.contains("not possible to fast-forward") || lower.contains("non-fast-forward") {
+        // git localizado: la negativa de ff-only por divergencia varía por
+        // locale (en: "not possible to fast-forward" / es: "no es posible
+        // hacer fast-forward") — nunca por corrupción o I/O.
+        let stage = if lower.contains("not possible to fast-forward")
+            || lower.contains("non-fast-forward")
+            || lower.contains("no es posible hacer fast-forward")
+        {
             "branch_diverged"
         } else {
             "integration"
@@ -403,7 +409,18 @@ fn safe_abort(env: &Path, args: &[&str]) -> Result<(), String> {
         Ok(_) => Ok(()),
         Err(error) => {
             let lower = error.to_lowercase();
-            if lower.contains("no merge") || lower.contains("no rebase") {
+            // git localizado: los mensajes "nada en progreso" varían por locale
+            // (en: "no merge in progress" / es: "no hay una fusión para abortar",
+            // "no hay rebase en progreso", "no hay merge en progreso").
+            let aborting_rebase = args.first() == Some(&"rebase");
+            let nothing_in_progress = if aborting_rebase {
+                lower.contains("no rebase") || lower.contains("no hay rebase")
+            } else {
+                lower.contains("no merge")
+                    || lower.contains("no hay una fusión")
+                    || lower.contains("no hay merge")
+            };
+            if nothing_in_progress {
                 Ok(())
             } else {
                 Err(error)
@@ -420,7 +437,7 @@ fn safe_abort(env: &Path, args: &[&str]) -> Result<(), String> {
 pub async fn merge_preflight_abort(repo: String, env_id: String) -> Result<(), String> {
     tokio::task::spawn_blocking(move || merge_preflight_abort_inner(repo, env_id))
         .await
-        .map_err(|error| format!("merge_preflight_abort: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("merge_preflight_abort: fallo en la tarea bloqueante: {error}"))?
 }
 
 pub(crate) fn merge_preflight_abort_inner(repo: String, env_id: String) -> Result<(), String> {
@@ -456,7 +473,7 @@ pub(crate) fn merge_preflight_abort_inner(repo: String, env_id: String) -> Resul
 pub async fn merge_rebase_onto_target(repo: String, env_id: String) -> Result<MergeOutcome, String> {
     tokio::task::spawn_blocking(move || merge_rebase_onto_target_inner(repo, env_id))
         .await
-        .map_err(|error| format!("merge_rebase_onto_target: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("merge_rebase_onto_target: fallo en la tarea bloqueante: {error}"))?
 }
 
 pub(crate) fn merge_rebase_onto_target_inner(repo: String, env_id: String) -> Result<MergeOutcome, String> {
@@ -476,7 +493,7 @@ pub(crate) fn merge_rebase_onto_target_inner(repo: String, env_id: String) -> Re
         return Ok(MergeOutcome {
             merged: false,
             stage: "rebase_ok".to_string(),
-            output: "Reconciliado com o alvo atualizado — pronto para reintegrar.".to_string(),
+            output: "Reconciliado con el objetivo actualizado: listo para reintegrar.".to_string(),
             ..Default::default()
         });
     }
@@ -505,7 +522,7 @@ pub(crate) fn merge_rebase_onto_target_inner(repo: String, env_id: String) -> Re
         return Ok(MergeOutcome {
             merged: false,
             stage: "rebase_conflict".to_string(),
-            output: format!("Conflitos ao reconciliar com o alvo atualizado: {paths}"),
+            output: format!("Conflictos al reconciliar con el objetivo actualizado: {paths}"),
             ..Default::default()
         });
     }
@@ -538,7 +555,7 @@ pub struct ForceCleanupResult {
 pub async fn merge_force_cleanup(repo: String, env_id: String) -> Result<ForceCleanupResult, String> {
     tokio::task::spawn_blocking(move || merge_force_cleanup_inner(repo, env_id))
         .await
-        .map_err(|error| format!("merge_force_cleanup: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("merge_force_cleanup: fallo en la tarea bloqueante: {error}"))?
 }
 
 pub(crate) fn merge_force_cleanup_inner(repo: String, env_id: String) -> Result<ForceCleanupResult, String> {
@@ -573,7 +590,7 @@ pub(crate) fn merge_force_cleanup_inner(repo: String, env_id: String) -> Result<
 pub async fn merge_abort(repo: String, env_id: String) -> Result<(), String> {
     tokio::task::spawn_blocking(move || merge_abort_inner(repo, env_id))
         .await
-        .map_err(|error| format!("merge_abort: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("merge_abort: fallo en la tarea bloqueante: {error}"))?
 }
 
 pub(crate) fn merge_abort_inner(repo: String, env_id: String) -> Result<(), String> {

@@ -143,7 +143,7 @@ pub async fn save_projects(app: AppHandle, content: String, sequence: u64) -> Re
         Ok(())
     })
     .await
-    .map_err(|error| format!("save_projects: falha na task bloqueante: {error}"))??;
+    .map_err(|error| format!("save_projects: fallo en la tarea bloqueante: {error}"))??;
 
     // Só avança a sequência após a gravação física confirmar sucesso — uma
     // falha acima (write/rename) retorna Err antes de chegar aqui, e o
@@ -182,7 +182,7 @@ fn resolve_clone_target(requested: &str, normalized_url: &str) -> Result<String,
     let trimmed = requested.trim();
     let base = if trimmed.is_empty() {
         dirs_next::home_dir()
-            .ok_or_else(|| "Não foi possível localizar a pasta do usuário".to_string())?
+            .ok_or_else(|| "No fue posible localizar la carpeta del usuario".to_string())?
             .join("Alethe")
     } else {
         std::path::PathBuf::from(trimmed)
@@ -225,11 +225,11 @@ pub async fn clone_github_repo(url: String, target_dir: String) -> Result<String
         cmd.args(["clone", "--depth", "1", &normalized, &target_dir]);
         crate::git_control::hide_console(&mut cmd);
 
-        let output = cmd.output().map_err(|e| format!("Falha ao executar git clone: {e}"))?;
+        let output = cmd.output().map_err(|e| format!("Fallo al ejecutar git clone: {e}"))?;
 
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
-            return Err(format!("Erro ao clonar repositório ({normalized}): {stderr}"));
+            return Err(format!("Error al clonar repositorio ({normalized}): {stderr}"));
         }
 
         // Gera os arquivos de briefing de contexto para os agentes de IA
@@ -241,7 +241,7 @@ pub async fn clone_github_repo(url: String, target_dir: String) -> Result<String
         Ok(target_dir)
     })
     .await
-    .map_err(|e| format!("Erro de concorrência na task de clone: {e}"))?
+    .map_err(|e| format!("Error de concurrencia en la tarea de clonación: {e}"))?
 }
 
 /// Analisa o repositório clonado e gera o arquivo `AGENTS.md` e `CLAUDE.md` com briefing inicial.
@@ -254,7 +254,7 @@ fn generate_repo_context_files(project_dir: &str) -> Result<(), String> {
     let readme_content = ["README.md", "README.txt", "readme.md", "README"]
         .iter()
         .find_map(|f| fs::read_to_string(path.join(f)).ok())
-        .unwrap_or_else(|| "Nenhum README encontrado.".to_string());
+        .unwrap_or_else(|| "No se encontró ningún README.".to_string());
 
     let mut tech_stack = Vec::new();
     if path.join("package.json").exists() { tech_stack.push("Node.js / JavaScript / TypeScript"); }
@@ -262,7 +262,7 @@ fn generate_repo_context_files(project_dir: &str) -> Result<(), String> {
     if path.join("pyproject.toml").exists() || path.join("requirements.txt").exists() { tech_stack.push("Python"); }
     if path.join("go.mod").exists() { tech_stack.push("Go"); }
 
-    let stack_str = if tech_stack.is_empty() { "Não especificada".to_string() } else { tech_stack.join(", ") };
+    let stack_str = if tech_stack.is_empty() { "No especificada".to_string() } else { tech_stack.join(", ") };
 
     // Truncar README para os primeiros 1500 caracteres
     let truncated_readme = if readme_content.len() > 1500 {
@@ -272,12 +272,12 @@ fn generate_repo_context_files(project_dir: &str) -> Result<(), String> {
     };
 
     let context_markdown = format!(
-        "# Contexto Inicial do Projeto (Alethe AI Briefing)\n\n\
-        > Este repositório foi clonado via Alethe. O briefing abaixo descreve a aplicação para orientar sua assistência.\n\n\
-        ## Tecnologias Detectadas\n- {stack_str}\n\n\
-        ## Resumo do Repositório (README)\n```markdown\n{truncated_readme}\n```\n\n\
-        ## Instrução Importante para o Agente\n\
-        Ao iniciar a conversa com o usuário neste repositório, faça um resumo executivo direto de 2 a 3 frases explicando o propósito deste projeto.\n"
+        "# Contexto Inicial del Proyecto (Alethe AI Briefing)\n\n\
+        > Este repositorio fue clonado con Alethe. El briefing a continuación describe la aplicación para orientar su asistencia.\n\n\
+        ## Tecnologías Detectadas\n- {stack_str}\n\n\
+        ## Resumen del Repositorio (README)\n```markdown\n{truncated_readme}\n```\n\n\
+        ## Instrucción Importante para el Agente\n\
+        Al iniciar la conversación con el usuario en este repositorio, realiza un resumen ejecutivo directo de 2 a 3 frases explicando el propósito de este proyecto.\n"
     );
 
     let _ = fs::write(path.join("AGENTS.md"), &context_markdown);

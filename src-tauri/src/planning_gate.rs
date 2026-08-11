@@ -72,7 +72,12 @@ fn parse_status_md(content: &str) -> (Option<String>, Option<u8>) {
 }
 
 fn is_complete_status(status: &str) -> bool {
-    matches!(status, "completed" | "complete" | "done")
+    // Valores en inglés (históricos) y en español (escritos por el plugin
+    // alethe-gsd-state.ts desde la localización a español).
+    matches!(
+        status,
+        "completed" | "complete" | "done" | "completada" | "completado" | "completo" | "hecho"
+    )
 }
 
 /// Um item de checklist markdown (`- [ ] texto`/`- [x] texto`), com o texto

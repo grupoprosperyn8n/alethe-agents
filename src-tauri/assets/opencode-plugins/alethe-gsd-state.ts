@@ -1,65 +1,64 @@
 // alethe-managed: v12
-// Gerado automaticamente pelo Alethe. Seguro editar — se você mudar este
-// arquivo, remova ou altere a linha acima ("alethe-managed: vN") para
-// impedir que o Alethe sobrescreva suas mudanças em versões futuras.
+// Generado automáticamente por Alethe. Seguro editar — si cambias este
+// archivo, elimina o altera la línea de arriba ("alethe-managed: vN") para
+// impedir que Alethe sobrescriba tus cambios en versiones futuras.
 //
-// Mantém .planning/ sincronizado sozinho, sem depender do modelo lembrar de
-// fazer isso. Estrutura de planejamento (6 arquivos, sempre a mesma,
-// independente da complexidade da tarefa):
-//   - task.md        determinístico — checklist espelhando os todos.
-//   - status.md      determinístico — "Status: <Planning|In Progress|Completed>"
+// Mantiene .planning/ sincronizado solo, sin depender de que el modelo se
+// acuerde de hacerlo. Estructura de planificación (6 archivos, siempre la
+// misma, independientemente de la complejidad de la tarea):
+//   - task.md        determinístico — checklist que refleja los todos.
+//   - status.md      determinístico — "Status: <Completada|Planificación|En progreso>"
 //                    + "Progress: <pct>%".
-//   - progress.md    determinístico, SÓ ANEXA — histórico cronológico de
-//                    progresso, uma entrada por mudança real.
-//   - goal.md        só a IA escreve (via skill, numa SESSÃO-FILHA isolada).
-//   - plan.md        só a IA escreve (via skill, idem) — plano de
-//                    implementação (o QUE foi feito), sem passos de teste.
-//   - procedure.json só a IA escreve, mas via TOOL dedicada
-//                    (`gsd_record_step`), nunca texto solto — um item por
-//                    chamada, `{ description, category }`. É essa lista
-//                    estruturada que vira o checklist do "Briefing de
-//                    Testes" na Central de Merges (sem parsing de markdown,
-//                    sem título/texto solto virando item marcável por
-//                    engano). Reescrito do zero a cada ciclo, igual
-//                    goal.md/plan.md.
+//   - progress.md    determinístico, SOLO ANEXA — historial cronológico de
+//                    progreso, una entrada por cambio real.
+//   - goal.md        solo la IA lo escribe (vía skill, en una SESIÓN-HIJA aislada).
+//   - plan.md        solo la IA lo escribe (vía skill, ídem) — plan de
+//                    implementación (lo QUE se hizo), sin pasos de test.
+//   - procedure.json solo la IA lo escribe, pero vía TOOL dedicada
+//                    (`gsd_record_step`), nunca texto suelto — un item por
+//                    llamada, `{ description, category }`. Es esa lista
+//                    estructurada la que se convierte en el checklist del
+//                    "Briefing de Tests" en la Central de Merges (sin parsing
+//                    de markdown, sin título/texto suelto que termine siendo
+//                    un item marcable por error). Se reescribe desde cero en
+//                    cada ciclo, igual que goal.md/plan.md.
 //
-// Cada arquivo tem exatamente UM escritor (determinístico OU skill, nunca os
-// dois) — não há risco de um sobrescrever o outro, então não precisa de
+// Cada archivo tiene exactamente UN escritor (determinístico O skill, nunca los
+// dos) — no hay riesgo de que uno sobrescriba al otro, así que no hace falta
 // merge textual.
 //
-// A skill roda numa SESSÃO-FILHA (client.session.create, SEM parentID — uma
-// sessão-filha vinculada via parentID nasce sem acesso ao próprio histórico
-// quando reaberta depois via `--session <id>` na TUI; sem parentID ela
-// resume normalmente). Ela nasce sem acesso ao histórico do pai de qualquer
-// forma (confirmado empiricamente), então o plugin empacota manualmente, a
-// cada disparo, só o DELTA de mensagens novas da sessão principal desde a
-// última sincronização.
+// La skill corre en una SESIÓN-HIJA (client.session.create, SIN parentID — una
+// sesión-hija vinculada vía parentID nace sin acceso al propio historial
+// cuando se reabre después vía `--session <id>` en la TUI; sin parentID
+// reanuda normalmente). Nace sin acceso al historial del padre de cualquier
+// forma (confirmado empíricamente), así que el plugin empaqueta manualmente, en
+// cada disparo, solo el DELTA de mensajes nuevos de la sesión principal desde
+// la última sincronización.
 //
-// A sessão-filha é única e persistente por worktree — criada uma vez,
-// reaproveitada em todo ciclo seguinte. O id fica gravado em
-// `.planning/.gsd-child-session` (o Alethe usa esse arquivo pra abrir uma
-// pane "GSD Sync" anexada via `opencode --session <id>`), e
-// `.planning/.gsd-child-busy` marca enquanto ela está processando.
+// La sesión-hija es única y persistente por worktree — se crea una vez y se
+// reutiliza en todo ciclo siguiente. El id queda grabado en
+// `.planning/.gsd-child-session` (Alethe usa ese archivo para abrir un pane
+// "GSD Sync" anexado vía `opencode --session <id>`), y
+// `.planning/.gsd-child-busy` marca mientras está procesando.
 //
-// Modelo: cada ciclo tenta primeiro o MESMO modelo que a sessão principal
-// acabou de usar (espelhado, sempre automático) e, se isso falhar, tenta em
-// ordem a cadeia de fallback configurada globalmente no app (lida em
-// runtime de `.opencode/alethe-gsd-config.json`, escrito pelo Alethe a cada
-// spawn). Falha é detectada via `session.error` (evento dedicado,
-// confirmado empiricamente — não é uma promise rejeitada) seguido de
-// `session.idle`; só escreve `.planning/.gsd-child-error` se TODA a cadeia
-// esgotar.
+// Modelo: cada ciclo intenta primero el MISMO modelo que la sesión principal
+// acaba de usar (espejado, siempre automático) y, si falla, intenta en orden
+// la cadena de fallback configurada globalmente en el app (leída en runtime
+// de `.opencode/alethe-gsd-config.json`, escrito por Alethe en cada spawn).
+// El fallo se detecta vía `session.error` (evento dedicado, confirmado
+// empíricamente — no es una promise rechazada) seguido de `session.idle`;
+// solo escribe `.planning/.gsd-child-error` si TODA la cadena se agota.
 //
-// Gatilho do skill: ao fim de todo turno com atividade REAL desde o último
-// aviso (session.idle DA SESSÃO PRINCIPAL + dirty) — `todowrite` OU qualquer
-// tool de trabalho (`write`/`edit`/`patch`/`bash`). `todowrite` sozinho não
-// bastava: só dispara quando o modelo decide montar lista de tarefas, o que
-// tende a acontecer só no primeiro pedido "grande" da sessão — pedidos
-// menores depois (ex.: "adiciona um .env.example") iam direto pra `write`
-// sem lista nenhuma e nunca disparavam sincronização.
+// Gatillo de la skill: al final de todo turno con actividad REAL desde el
+// último aviso (session.idle DE LA SESIÓN PRINCIPAL + dirty) — `todowrite` O
+// cualquier tool de trabajo (`write`/`edit`/`patch`/`bash`). `todowrite` solo
+// no bastaba: solo dispara cuando el modelo decide armar la lista de tareas,
+// lo que tiende a pasar solo en el primer pedido "grande" de la sesión —
+// pedidos menores después (p. ej.: "agrega un .env.example") iban directo a
+// `write` sin lista alguna y nunca disparaban sincronización.
 //
-// Validado empiricamente contra opencode 1.18.11 real (server mode, modelo
-// gratuito) antes de ser embutido no binário do Alethe — ver
+// Validado empíricamente contra opencode 1.18.11 real (server mode, modelo
+// gratuito) antes de embeberse en el binario de Alethe — ver
 // docs/CHANGELOG.md.
 
 import type { Plugin } from '@opencode-ai/plugin'
@@ -83,45 +82,46 @@ const CHILD_BUSY_SENTINEL = '.gsd-child-busy'
 const CHILD_ERROR_SENTINEL = '.gsd-child-error'
 const PROCEDURE_FILE = 'procedure.json'
 const MODEL_CHAIN_CONFIG_PATH = '.opencode/alethe-gsd-config.json'
-// Tools que indicam trabalho real feito (não só leitura/investigação) — além
-// de `todowrite`, qualquer uma dessas também marca a sessão como "dirty" pra
-// disparar um ciclo GSD Sync novo, mesmo sem lista de tarefas envolvida.
+// Tools que indican trabajo real hecho (no solo lectura/investigación) — además
+// de `todowrite`, cualquiera de estas también marca la sesión como "dirty" para
+// disparar un ciclo GSD Sync nuevo, aunque no haya lista de tareas.
 const WORK_SIGNAL_TOOLS = new Set(['write', 'edit', 'patch', 'bash'])
 
-const SKILL_PROMPT = `Atualize os arquivos de planejamento desta worktree:
-1. .planning/goal.md — objetivo desta tarefa/sessão (o que deve ser alcançado), cobrindo TODO o trabalho feito nesta worktree até agora — não só o pedido mais recente. Reescreva do zero.
-2. .planning/plan.md — plano passo a passo do que foi/será feito, cobrindo TODAS as tarefas desta worktree até agora. NÃO inclua passos de teste/validação aqui — use a ferramenta "gsd_record_step" pra isso (item 3).
-3. Ferramenta "gsd_record_step" — chame ela UMA VEZ pra CADA passo que um humano precisa confirmar manualmente pra validar TODO o trabalho desta worktree até agora (não só a tarefa mais recente), nunca uma amostra. Cada chamada é um passo isolado e acionável.
-ESCOPO E PROPORCIONALIDADE (regra crítica pro procedimento de teste): o procedimento cobre SÓ os arquivos listados na seção "Arquivos alterados/criados nesta sessão" abaixo — nunca invente passo pra testar rota, comando, servidor ou arquivo que não está nessa lista, mesmo que exista no resto do projeto. A quantidade e complexidade dos passos reflete a complexidade REAL da mudança, nunca o tamanho do app inteiro:
-  - Mudança simples (ex.: criar/editar um arquivo de documentação ou config estático) → procedimento simples, normalmente 1-2 passos. Exemplo: "action: abrir <arquivo> e conferir que existe em <caminho exato>" + "verify: conferir que o conteúdo tem <estrutura específica citada de verdade, ex. as seções X/Y/Z>". NÃO rode servidor, NÃO teste API, NÃO abra nada fora do que foi alterado só porque "poderia ser relevante".
-  - Mudança em código com efeito observável em runtime (rota nova, comportamento de UI, lógica) → aí cabe setup/action/verify envolvendo rodar/interagir com o sistema, mas só a parte que ESSA mudança especificamente afeta — nunca uma varredura geral do app.
-IMPORTANTE: nunca afirme que algo "funciona" ou "está correto" — você não verificou, só implementou/planejou. A confirmação de que funcionou ou não é sempre do usuário.
-IMPORTANTE: o resumo da conversa abaixo é só contexto de alto nível, não é fonte confiável pra detalhes exatos. Antes de chamar "gsd_record_step" com um passo que cite um texto específico (mensagem de erro, saída de console, nome de comando, formato de dado), ABRA e releia o arquivo de verdade pra copiar o texto exato dali — nunca escreva de memória ou por suposição/inferência do que "provavelmente" o código faz. Se não conseguir confirmar um detalhe lendo o código, descreva o passo em termos gerais em vez de inventar um texto específico.
-NÃO escreva em .planning/status.md, .planning/task.md nem .planning/progress.md — esses são mantidos automaticamente por outro processo, fora do seu controle.
-Não implemente nem corrija nada agora — só documente/registre.
+const SKILL_PROMPT = `Actualice los archivos de planificación de esta worktree:
+1. .planning/goal.md — objetivo de esta tarea/sesión (lo que debe alcanzarse), cubriendo TODO el trabajo hecho en esta worktree hasta ahora — no solo la petición más reciente. Reescríbalo desde cero.
+2. .planning/plan.md — plan paso a paso de lo que se hizo/se hará, cubriendo TODAS las tareas de esta worktree hasta ahora. NO incluya pasos de test/validación aquí — use la herramienta "gsd_record_step" para eso (punto 3).
+3. Herramienta "gsd_record_step" — llámela UNA VEZ por CADA paso que un humano debe confirmar manualmente para validar TODO el trabajo de esta worktree hasta ahora (no solo la tarea más reciente), nunca una muestra. Cada llamada es un paso aislado y accionable.
+ALCANCE Y PROPORCIONALIDAD (regla crítica para el procedimiento de test): el procedimiento cubre SOLO los archivos listados en la sección "Archivos modificados/creados en esta sesión" abajo — nunca invente pasos para probar rutas, comandos, servidores o archivos que no están en esa lista, aunque existan en el resto del proyecto. La cantidad y complejidad de los pasos refleja la complejidad REAL del cambio, nunca el tamaño de toda la app:
+  - Cambio simple (p. ej.: crear/editar un archivo de documentación o configuración estática) → procedimiento simple, normalmente 1-2 pasos. Ejemplo: "action: abrir <archivo> y comprobar que existe en <ruta exacta>" + "verify: comprobar que el contenido tiene <estructura específica citada de verdad, p. ej. las secciones X/Y/Z>". NO ejecute servidores, NO pruebe APIs, NO abra nada fuera de lo modificado solo porque "podría ser relevante".
+  - Cambio en código con efecto observable en runtime (ruta nueva, comportamiento de UI, lógica) → ahí cabe setup/action/verify con ejecución/interacción con el sistema, pero solo la parte que ESE cambio afecta específicamente — nunca un barrido general de la app.
+IMPORTANTE: nunca afirme que algo "funciona" o "está correcto" — usted no lo verificó, solo implementó/planeó. La confirmación de que funcionó o no es siempre del usuario.
+IMPORTANTE: el resumen de la conversación abajo es solo contexto de alto nivel, no es fuente confiable para detalles exactos. Antes de llamar a "gsd_record_step" con un paso que cite un texto específico (mensaje de error, salida de consola, nombre de comando, formato de dato), ABRA y relea el archivo real para copiar el texto exacto de ahí — nunca escriba de memoria ni por suposición/inferencia de lo que "probablemente" hace el código. Si no puede confirmar un detalle leyendo el código, describa el paso en términos generales en lugar de inventar un texto específico.
+NO escriba en .planning/status.md, .planning/task.md ni .planning/progress.md — esos se mantienen automáticamente por otro proceso, fuera de su control.
+No implemente ni corrija nada ahora — solo documente/registre.
 
-Contexto da sessão principal (delta desde a última sincronização) segue abaixo, se houver — é só um resumo em texto solto da conversa, não confie nele pra detalhes exatos de código.`
+Contexto de la sesión principal (delta desde la última sincronización) sigue abajo, si lo hay — es solo un resumen en texto suelto de la conversación, no confíe en él para detalles exactos de código.`
 
-/** Um arquivo é excluído do escopo do procedimento se for infraestrutura do
- *  próprio Alethe (`.planning/` — estado deste plugin — e `.opencode/`/
- *  `opencode.json`, escritos automaticamente a cada spawn: plugin GSD, MCP do
- *  Graphify) — nenhum dos dois é trabalho real do usuário nesta sessão; sem
- *  essa exclusão a sessão-filha via esses arquivos em `git status`/`git diff`
- *  e inventava passo de teste pra "validar que o plugin carrega", desconectado
- *  da tarefa real. */
+/** Un archivo queda excluido del alcance del procedimiento si es
+ *  infraestructura del propio Alethe (`.planning/` — estado de este plugin —
+ *  y `.opencode/`/`opencode.json`, escritos automáticamente en cada spawn:
+ *  plugin GSD, MCP de Graphify) — ninguno de los dos es trabajo real del
+ *  usuario en esta sesión; sin esta exclusión la sesión-hija veía esos
+ *  archivos en `git status`/`git diff` e inventaba pasos de test para
+ *  "validar que el plugin carga", desconectado de la tarea real. */
 function isRealWork(f: string): boolean {
   return Boolean(f) && !f.startsWith(`${PLANNING_DIR}/`) && !f.startsWith('.opencode/') && f !== 'opencode.json'
 }
 
-/** Arquivos já COMMITADOS nesta worktree desde que a branch divergiu de
- *  `main`/`master` — complementa `getChangedFiles` (que só vê working tree)
- *  com trabalho de ciclos anteriores que já foi commitado (merge parcial,
- *  commit manual do usuário) nesse meio-tempo. Sem isso, `clearProcedure`
- *  zerando `procedure.json` a cada ciclo (ver comentário no topo do arquivo)
- *  faz o passo de validação daquele trabalho ser perdido de verdade — ele
- *  desaparece de `git status` assim que é commitado, e a regra de escopo do
- *  prompt abaixo proíbe inventar passo pra arquivo fora da lista. Best-effort:
- *  sem `main`/`master` resolvível, devolve lista vazia — não bloqueia o ciclo. */
+/** Archivos ya COMMITEADOS en esta worktree desde que la rama divergió de
+ *  `main`/`master` — complementa `getChangedFiles` (que solo ve working tree)
+ *  con trabajo de ciclos anteriores que ya se commiteó (merge parcial,
+ *  commit manual del usuario) en el medio. Sin esto, `clearProcedure`
+ *  vaciando `procedure.json` en cada ciclo (ver comentario al inicio del
+ *  archivo) haría que el paso de validación de ese trabajo se perdiera de
+ *  verdad — desaparece de `git status` apenas se commitea, y la regla de
+ *  alcance del prompt de abajo prohíbe inventar pasos para archivos fuera de
+ *  la lista. Best-effort: sin `main`/`master` resoluble, devuelve lista
+ *  vacía — no bloquea el ciclo. */
 async function getCommittedFilesSinceBase(root: string): Promise<string[]> {
   for (const base of ['main', 'master']) {
     try {
@@ -131,26 +131,26 @@ async function getCommittedFilesSinceBase(root: string): Promise<string[]> {
       const { stdout } = await execFileAsync('git', ['diff', '--name-only', `${mergeBase}..HEAD`], { cwd: root })
       return stdout.split('\n').map((line) => line.trim()).filter(Boolean)
     } catch {
-      // base não existe localmente ou merge-base falhou — tenta a próxima
+      // la base no existe localmente o merge-base falló — intenta la siguiente
     }
   }
   return []
 }
 
-/** Lista arquivos alterados/criados/commitados nesta worktree — une working
- *  tree (`git status --porcelain`, cobre não commitado) com o histórico de
- *  commits desde a base da branch (`getCommittedFilesSinceBase`, cobre
- *  commitado). Fonte de verdade sobre O QUE mudou de verdade nesta worktree,
- *  pra instruir a sessão-filha a reler exatamente esses arquivos em vez de
- *  confiar só no resumo em prosa da conversa (que nunca tem detalhe exato o
- *  suficiente pra escrever validação precisa). */
+/** Lista archivos modificados/creados/commiteados en esta worktree — une el
+ *  working tree (`git status --porcelain`, cubre lo no commiteado) con el
+ *  historial de commits desde la base de la rama (`getCommittedFilesSinceBase`,
+ *  cubre lo commiteado). Fuente de verdad sobre QUÉ cambió de verdad en esta
+ *  worktree, para instruir a la sesión-hija a releer exactamente esos archivos
+ *  en lugar de confiar solo en el resumen en prosa de la conversación (que
+ *  nunca tiene detalle exacto suficiente para escribir validación precisa). */
 async function getChangedFiles(root: string): Promise<string[]> {
   let uncommitted: string[] = []
   try {
     const { stdout } = await execFileAsync('git', ['status', '--porcelain=v1'], { cwd: root })
     uncommitted = stdout.split('\n').map((line) => line.slice(3).trim())
   } catch {
-    // sem git/fora de um repo — segue só com o que getCommittedFilesSinceBase achar
+    // sin git/fuera de un repo — sigue solo con lo que getCommittedFilesSinceBase encuentre
   }
   const committed = await getCommittedFilesSinceBase(root)
   const all = new Set([...uncommitted, ...committed].filter(isRealWork))
@@ -162,18 +162,18 @@ function renderTask(todos: Todo[]): string {
 }
 
 function renderStatus(total: number, completed: number): string {
-  const label = completed === total ? 'Completed' : completed === 0 ? 'Planning' : 'In Progress'
+  const label = completed === total ? 'Completada' : completed === 0 ? 'Planificación' : 'En progreso'
   const progress = total > 0 ? Math.round((completed / total) * 100) : 0
   return `Status: ${label}\nProgress: ${progress}%\n`
 }
 
 function renderProgressEntry(total: number, completed: number): string {
   const stamp = new Date().toISOString()
-  return `## ${stamp}\n\nProgresso atualizado: ${completed}/${total} tarefas concluídas.\n\n`
+  return `## ${stamp}\n\nProgreso actualizado: ${completed}/${total} tareas completadas.\n\n`
 }
 
-/** Extrai texto legível das `parts` de uma mensagem (`session.messages`),
- *  ignorando partes não-texto (step-start/step-finish/tool-call etc.). */
+/** Extrae texto legible de las `parts` de un mensaje (`session.messages`),
+ *  ignorando partes no-texto (step-start/step-finish/tool-call etc.). */
 function extractMessageText(message: any): string {
   const parts = Array.isArray(message?.parts) ? message.parts : []
   return parts
@@ -183,9 +183,9 @@ function extractMessageText(message: any): string {
     .join('\n')
 }
 
-/** `providerID`/`modelID` da última mensagem do assistente — o modelo que a
- *  sessão principal acabou de usar com sucesso, "conhecido bom" por
- *  construção. `null` se a sessão ainda não tem nenhuma resposta. */
+/** `providerID`/`modelID` del último mensaje del asistente — el modelo que la
+ *  sesión principal acaba de usar con éxito, "conocido bueno" por
+ *  construcción. `null` si la sesión todavía no tiene ninguna respuesta. */
 function extractMirroredModel(messages: any[]): ModelRef | null {
   const lastAssistant = [...messages].reverse().find((m) => m?.info?.role === 'assistant')
   const providerID = lastAssistant?.info?.providerID
@@ -197,48 +197,51 @@ export const AletheGsdStatePlugin: Plugin = async ({ directory, worktree, client
   const root = (worktree as string | undefined) ?? directory
   const planningDir = join(root, PLANNING_DIR)
   let lastTask = ''
-  // Houve todowrite desde o último aviso ao usuário/skill — dispara na
-  // próxima session.idle da sessão principal.
+  // Hubo todowrite desde el último aviso al usuario/skill — dispara en el
+  // próximo session.idle de la sesión principal.
   let dirty = false
-  // Sessão-filha atual (cacheada depois de lida/criada uma vez).
+  // Sesión-hija actual (cacheada después de leerse/crearse una vez).
   let childSessionId: string | null = null
-  // Enquanto true, ignora todowrite (provavelmente é a sessão-filha
-  // documentando o próprio trabalho, não o plano do agente principal) —
-  // fallback seguro caso o hook de tool não exponha de qual sessão veio.
-  // Também true durante toda a cadeia de tentativas de modelo (não só a 1ª).
+  // Mientras true, ignora todowrite (probablemente es la sesión-hija
+  // documentando su propio trabajo, no el plan del agente principal) —
+  // fallback seguro en caso de que el hook de tool no exponga de qué sesión
+  // vino. También true durante toda la cadena de intentos de modelo (no solo
+  // el 1º).
   let childBusy = false
-  // Cursor de delta: nº de mensagens da sessão principal já mandadas pra
-  // sessão-filha.
+  // Cursor de delta: nº de mensajes de la sesión principal ya enviados a la
+  // sesión-hija.
   let lastSyncedMessageCount = 0
-  // Todos de um `todowrite` que chegou enquanto `childBusy` era true — sem
-  // isso, esse todowrite era descartado em silêncio (nem task.md/status.md
-  // atualizavam, nem um novo ciclo era agendado). Se fosse o ÚLTIMO todowrite
-  // da sessão principal, status.md ficava preso em "In Progress" pra sempre,
-  // travando o Gate de Conclusão de Planejamento na Central de Merges.
-  // Flusha assim que o ciclo atual da sessão-filha terminar (`setChildBusy(false)`).
+  // Todos de un `todowrite` que llegó mientras `childBusy` era true — sin
+  // esto, ese todowrite se descartaba en silencio (ni task.md/status.md se
+  // actualizaban, ni se agendaba un ciclo nuevo). Si era el ÚLTIMO todowrite
+  // de la sesión principal, status.md quedaba trabado en "En progreso" para
+  // siempre, trabando el Gate de Conclusión de Planificación en la Central de
+  // Merges. Se vacía apenas termina el ciclo actual de la sesión-hija
+  // (`setChildBusy(false)`).
   let pendingTodos: Todo[] | null = null
 
-  // Estado da cadeia de fallback em andamento (só existe durante um ciclo).
+  // Estado de la cadena de fallback en curso (solo existe durante un ciclo).
   let activeChain: ModelRef[] = []
   let activeChainIndex = 0
   let activePromptText = ''
   let attemptFailed = false
   let lastAttemptErrorMessage = ''
 
-  // Reconciliação de boot: `.gsd-child-busy` só é limpo por `setChildBusy(false)`,
-  // chamado quando ESTE processo detecta `session.idle`/`session.error` da
-  // sessão-filha. Se o processo morrer no meio de um ciclo (pane fechado, app
-  // reiniciado, travamento do modelo) sem passar por ali, o sentinel fica
-  // órfão em disco pra sempre — a UI (que só lê o arquivo, nunca reconstrói
-  // estado do processo antigo) mostra "Sincronizando" eternamente mesmo sem
-  // nada rodando de verdade. Uma instância do plugin que está subindo agora
-  // não tem `activeChain` nenhuma ainda (linha acima, sempre vazia no boot),
-  // então qualquer sentinel pré-existente é necessariamente órfão de um
-  // processo anterior — nunca do próprio.
+  // Reconciliación de boot: `.gsd-child-busy` solo se limpia con
+  // `setChildBusy(false)`, llamado cuando ESTE proceso detecta
+  // `session.idle`/`session.error` de la sesión-hija. Si el proceso muere en
+  // medio de un ciclo (pane cerrado, app reiniciada, bloqueo del modelo) sin
+  // pasar por ahí, el sentinel queda huérfano en disco para siempre — la UI
+  // (que solo lee el archivo, nunca reconstruye estado del proceso antiguo)
+  // muestra "Sincronizando" eternamente aunque no esté corriendo nada de
+  // verdad. Una instancia del plugin que está arrancando ahora no tiene
+  // `activeChain` ninguna todavía (línea de arriba, siempre vacía en el boot),
+  // así que cualquier sentinel preexistente es necesariamente huérfano de un
+  // proceso anterior — nunca del propio.
   void rm(join(planningDir, CHILD_BUSY_SENTINEL), { force: true }).catch(() => {})
 
   async function syncStructure(todos: Todo[]) {
-    if (!Array.isArray(todos) || todos.length === 0) return // nunca inventa progresso sem nenhum todo real
+    if (!Array.isArray(todos) || todos.length === 0) return // nunca inventa progreso sin ningún todo real
     await mkdir(planningDir, { recursive: true }).catch(() => {})
     const completed = todos.filter((t) => t.status === 'completed').length
     const total = todos.length
@@ -260,8 +263,8 @@ export const AletheGsdStatePlugin: Plugin = async ({ directory, worktree, client
       return childSessionId
     }
     try {
-      // SEM parentID — ver nota no cabeçalho do arquivo sobre por que uma
-      // sessão-filha vinculada não resumia com histórico visível na TUI.
+      // SIN parentID — ver nota en el encabezado del archivo sobre por qué una
+      // sesión-hija vinculada no reanudaba con historial visible en la TUI.
       const created: any = await (client as any).session.create({
         body: { directory: root, title: 'Alethe · GSD Sync' },
       })
@@ -297,9 +300,9 @@ export const AletheGsdStatePlugin: Plugin = async ({ directory, worktree, client
     }
   }
 
-  /** Cadeia efetiva: modelo espelhado (posição 0, sempre tentado primeiro,
-   *  automático) + cadeia de fallback configurada globalmente no app (lida
-   *  em runtime — muda sem precisar de nova versão do plugin). */
+  /** Cadena efectiva: modelo espejado (posición 0, siempre intentado primero,
+   *  automático) + cadena de fallback configurada globalmente en el app (leída
+   *  en runtime — cambia sin necesidad de una versión nueva del plugin). */
   async function buildEffectiveChain(mirrored: ModelRef | null): Promise<ModelRef[]> {
     const chain: ModelRef[] = []
     if (mirrored) chain.push(mirrored)
@@ -313,25 +316,24 @@ export const AletheGsdStatePlugin: Plugin = async ({ directory, worktree, client
         }
       }
     } catch {
-      // sem config/erro de parse — segue só com o modelo espelhado, se houver
+      // sin config/error de parse — sigue solo con el modelo espejado, si lo hay
     }
     return chain
   }
 
-  /** Zera `.planning/procedure.json` no início de cada ciclo novo — a
-   *  sessão-filha reconstrói a lista inteira via `gsd_record_step` (mesmo
-   *  espírito de "reescreve do zero" de goal.md/plan.md), então nunca fica
-   *  misturando passo de uma tarefa antiga já removida/mudada com o ciclo
-   *  atual. */
+  /** Vacía `.planning/procedure.json` al inicio de cada ciclo nuevo — la
+   *  sesión-hija reconstruye la lista completa vía `gsd_record_step` (mismo
+   *  espíritu de "reescribe desde cero" de goal.md/plan.md), así nunca mezcla
+   *  pasos de una tarea antigua ya removida/cambiada con el ciclo actual. */
   async function clearProcedure() {
     await mkdir(planningDir, { recursive: true }).catch(() => {})
     await writeFile(join(planningDir, PROCEDURE_FILE), '[]', 'utf8').catch(() => {})
   }
 
-  /** Acrescenta um passo em `.planning/procedure.json` (lê-modifica-escreve
-   *  — só a tool `gsd_record_step` chama isso, nunca concorrente com si
-   *  mesma dentro do mesmo ciclo, já que cada tool call do modelo espera a
-   *  anterior terminar). */
+  /** Agrega un paso en `.planning/procedure.json` (lee-modifica-escribe
+   *  — solo la tool `gsd_record_step` llama esto, nunca concurrente con sí
+   *  misma dentro del mismo ciclo, ya que cada tool call del modelo espera a
+   *  que la anterior termine). */
   async function appendProcedureStep(step: ProcedureStep) {
     const path = join(planningDir, PROCEDURE_FILE)
     const current: unknown = await readFile(path, 'utf8').then((s) => JSON.parse(s)).catch(() => [])
@@ -362,13 +364,13 @@ export const AletheGsdStatePlugin: Plugin = async ({ directory, worktree, client
     await writeFile(join(planningDir, CHILD_ERROR_SENTINEL), message, 'utf8').catch(() => {})
   }
 
-  /** Tenta o modelo atual de `activeChain[activeChainIndex]`. Uma falha
-   *  IMEDIATA (schema inválido, erro de rede — vem no próprio retorno de
-   *  `promptAsync`, não é uma promise rejeitada) avança pra próxima
-   *  tentativa direto, sem esperar evento nenhum (nada chegou a ser
-   *  disparado). Falha em runtime (modelo válido no schema mas
-   *  inexistente/indisponível) só aparece depois, via `session.error` +
-   *  `session.idle` do lado de fora desta função. */
+  /** Intenta el modelo actual de `activeChain[activeChainIndex]`. Un fallo
+   *  INMEDIATO (schema inválido, error de red — viene en el propio retorno de
+   *  `promptAsync`, no es una promise rechazada) avanza al siguiente intento
+   *  directo, sin esperar evento alguno (nada llegó a dispararse). El fallo
+   *  en runtime (modelo válido en el schema pero inexistente/indisponible)
+   *  solo aparece después, vía `session.error` + `session.idle` desde afuera
+   *  de esta función. */
   async function sendChainAttempt(childId: string) {
     const model = activeChain[activeChainIndex]
     const res: any = await (client as any).session
@@ -378,7 +380,7 @@ export const AletheGsdStatePlugin: Plugin = async ({ directory, worktree, client
       const msg = res.error?.data?.message ?? res.error?.name ?? 'unknown error'
       await advanceChainOrGiveUp(childId, msg)
     }
-    // sem erro imediato — aguarda session.error/session.idle normalmente
+    // sin error inmediato — espera session.error/session.idle normalmente
   }
 
   async function advanceChainOrGiveUp(childId: string, errorMessage: string) {
@@ -388,7 +390,7 @@ export const AletheGsdStatePlugin: Plugin = async ({ directory, worktree, client
       return
     }
     await writeChildError(
-      `Todos os ${activeChain.length} modelo(s) da cadeia falharam. Último erro: ${errorMessage}`,
+      `Todos los ${activeChain.length} modelo(s) de la cadena fallaron. Último error: ${errorMessage}`,
     )
     await setChildBusy(false)
     activeChain = []
@@ -399,28 +401,28 @@ export const AletheGsdStatePlugin: Plugin = async ({ directory, worktree, client
     tool: {
       gsd_record_step: tool({
         description:
-          'Registra UM passo de teste real que um humano precisa confirmar manualmente pra validar o trabalho desta worktree — nunca escreva passos de teste como texto solto em plan.md, sempre use esta ferramenta, uma chamada por passo. Escopo estrito: só os arquivos alterados/criados NESTA sessão, proporcional à complexidade real da mudança — nunca invente passo pra testar parte do app que não foi tocada.',
+          'Registra UN paso de test real que un humano debe confirmar manualmente para validar el trabajo de esta worktree — nunca escriba pasos de test como texto suelto en plan.md, use siempre esta herramienta, una llamada por paso. Alcance estricto: solo los archivos modificados/creados EN ESTA sesión, proporcional a la complejidad real del cambio — nunca invente pasos para probar partes de la app que no se tocaron.',
         args: {
           description: z
             .string()
-            .describe('O passo em si, em português, acionável (ex.: "Rodar npm run users e conferir que a lista aparece") — copie textos exatos (mensagens/comandos) do código real, nunca invente. Pra mudança simples (ex.: um arquivo de documentação), um passo do tipo "abrir <arquivo> e conferir <estrutura esperada>" já é suficiente — não infle com testes de partes do app não alteradas.'),
+            .describe('El paso en sí, en español, accionable (p. ej.: "Ejecutar npm run users y comprobar que la lista aparece") — copie textos exactos (mensajes/comandos) del código real, nunca invente. Para cambios simples (p. ej.: un archivo de documentación), un paso del tipo "abrir <archivo> y comprobar <estructura esperada>" ya es suficiente — no infle con tests de partes de la app no modificadas.'),
           category: z
             .enum(['setup', 'action', 'verify'])
-            .describe('setup = preparação necessária antes de testar; action = execução do próprio teste; verify = o que checar no resultado'),
+            .describe('setup = preparación necesaria antes de probar; action = ejecución de la propia prueba; verify = qué comprobar en el resultado'),
         },
         async execute(args) {
           await appendProcedureStep({ description: args.description, category: args.category })
-          return { output: `Passo registrado: [${args.category}] ${args.description}` }
+          return { output: `Paso registrado: [${args.category}] ${args.description}` }
         },
       }),
     },
     'tool.execute.after': async (input) => {
       const toolName = (input as { tool?: string }).tool
       if (childBusy) {
-        // Provável tool call da sessão-filha, não do agente principal — mas
-        // se for um todowrite de verdade do agente principal chegando nesse
-        // meio-tempo, represa os todos em vez de descartar (ver comentário
-        // de `pendingTodos`). Fica pendente até o ciclo atual terminar.
+        // Probable tool call de la sesión-hija, no del agente principal — pero
+        // si es un todowrite de verdad del agente principal llegando en el
+        // medio, represa los todos en lugar de descartarlos (ver comentario
+        // de `pendingTodos`). Queda pendiente hasta que el ciclo actual termine.
         if (toolName === 'todowrite') {
           pendingTodos = ((input as { args?: { todos?: Todo[] } }).args?.todos ?? []) as Todo[]
           dirty = true
@@ -433,13 +435,13 @@ export const AletheGsdStatePlugin: Plugin = async ({ directory, worktree, client
         dirty = true
         return
       }
-      // Trabalho real sem lista de tarefas: `todowrite` só dispara quando o
-      // modelo decide que a tarefa "merece" uma lista — pedidos pequenos
-      // depois do primeiro grande da sessão (ex.: "adiciona um .env.example")
-      // costumam pular isso e ir direto pra `write`/`edit`/`bash`, deixando
-      // esse trabalho de fora do ciclo GSD Sync pra sempre. Contar essas
-      // tools também garante que QUALQUER trabalho real da sessão — não só
-      // o primeiro pedido "grande" — dispara sincronização.
+      // Trabajo real sin lista de tareas: `todowrite` solo dispara cuando el
+      // modelo decide que la tarea "merece" una lista — pedidos pequeños
+      // después del primer grande de la sesión (p. ej.: "agrega un .env.example")
+      // suelen saltearse eso e ir directo a `write`/`edit`/`bash`, dejando ese
+      // trabajo fuera del ciclo GSD Sync para siempre. Contar estas tools
+      // también garantiza que CUALQUIER trabajo real de la sesión — no solo
+      // el primer pedido "grande" — dispare sincronización.
       if (toolName && WORK_SIGNAL_TOOLS.has(toolName)) {
         dirty = true
       }
@@ -457,8 +459,8 @@ export const AletheGsdStatePlugin: Plugin = async ({ directory, worktree, client
 
       if (event.type !== 'session.idle') return
 
-      // Sessão-filha ficou ociosa — ou terminou a tentativa atual com
-      // sucesso, ou falhou (sinalizado por session.error logo antes).
+      // Sesión-hija quedó ociosa — o terminó el intento actual con éxito, o
+      // falló (señalizado por session.error justo antes).
       if (sessionID === childSessionId) {
         if (attemptFailed) {
           attemptFailed = false
@@ -466,7 +468,7 @@ export const AletheGsdStatePlugin: Plugin = async ({ directory, worktree, client
           return
         }
         if (activeChain.length > 0) {
-          // sucesso — encerra o ciclo
+          // éxito — cierra el ciclo
           await setChildBusy(false)
           activeChain = []
           activeChainIndex = 0
@@ -474,9 +476,9 @@ export const AletheGsdStatePlugin: Plugin = async ({ directory, worktree, client
         return
       }
 
-      // session.idle de qualquer outra sessão que não seja a principal
-      // (child ainda não conhecido) — só a sessão principal, quando dirty,
-      // dispara um novo ciclo.
+      // session.idle de cualquier otra sesión que no sea la principal
+      // (child todavía no conocido) — solo la sesión principal, cuando dirty,
+      // dispara un ciclo nuevo.
       if (!dirty) return
       dirty = false
 
@@ -485,11 +487,11 @@ export const AletheGsdStatePlugin: Plugin = async ({ directory, worktree, client
 
       const { delta, mirrored } = await buildContextDeltaAndMirror(sessionID)
       const chain = await buildEffectiveChain(mirrored)
-      if (chain.length === 0) return // sessão principal ainda sem nenhuma resposta — não há modelo pra espelhar
+      if (chain.length === 0) return // sesión principal aún sin ninguna respuesta — no hay modelo para espejar
 
       const changedFiles = await getChangedFiles(root)
       const filesSection = changedFiles.length > 0
-        ? `\n\nArquivos alterados/criados nesta sessão (git status — fonte de verdade, releia CADA um antes de escrever o plano):\n${changedFiles.map((f) => `- ${f}`).join('\n')}`
+        ? `\n\nArchivos modificados/creados en esta sesión (git status — fuente de verdad, relea CADA uno antes de escribir el plan):\n${changedFiles.map((f) => `- ${f}`).join('\n')}`
         : ''
 
       await clearProcedure()

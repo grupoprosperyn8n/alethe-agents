@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
 import { planCliOpen } from '../lib/cliOpen'
-import { useT } from '../lib/i18n'
+import { useAgentLabel, useT } from '../lib/i18n'
 import { cliTakePendingOpen, listenCliOpenPath } from '../lib/tauri'
 import type { AgentType } from '../lib/types'
 import { useProjectsStore } from '../stores/projectsStore'
@@ -19,18 +19,9 @@ import { useUiStore } from '../stores/uiStore'
 /** Ordem de preferência do agente do primeiro terminal; cai em `shell`. */
 const AGENT_PREFERENCE: AgentType[] = ['claude', 'codex', 'antigravity', 'opencode', 'shell']
 
-const AGENT_LABEL: Record<AgentType, string> = {
-  claude: 'Claude',
-  codex: 'Codex',
-  antigravity: 'Antigravity',
-  opencode: 'OpenCode',
-  shell: 'Shell',
-  hermes: 'Hermes',
-  pi: 'Pi',
-}
-
 export function useCliOpenRequests(hydrated: boolean) {
   const t = useT()
+  const agentLabel = useAgentLabel()
 
   useEffect(() => {
     // Só depois da hidratação: agir antes de `projects.json` carregar faria
@@ -52,7 +43,7 @@ export function useCliOpenRequests(hydrated: boolean) {
       const agent =
         AGENT_PREFERENCE.find((candidate) => store.preferences.enabledAgents[candidate]) ?? 'shell'
       const terminal = store.createTerminal(project.id, {
-        name: AGENT_LABEL[agent],
+        name: agentLabel(agent),
         cwd: plan.cwd,
         firstTab: { type: agent, cwd: plan.cwd, runtimeProfile: 'lean' },
       })

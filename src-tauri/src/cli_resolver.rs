@@ -651,7 +651,7 @@ fn discover_provider_models_inner(provider: String) -> Result<Vec<ModelOption>, 
 pub async fn discover_provider_models(provider: String) -> Result<Vec<ModelOption>, String> {
     tokio::task::spawn_blocking(move || discover_provider_models_inner(provider))
         .await
-        .map_err(|error| format!("discover_provider_models: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("discover_provider_models: fallo en la tarea bloqueante: {error}"))?
 }
 
 #[cfg(test)]

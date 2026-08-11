@@ -75,7 +75,7 @@ fn gsd_opencode_plugin_write_inner(repo: String, model_chain: Vec<String>) -> Re
 pub async fn gsd_opencode_plugin_write(repo: String, model_chain: Vec<String>) -> Result<(), String> {
     tokio::task::spawn_blocking(move || gsd_opencode_plugin_write_inner(repo, model_chain))
         .await
-        .map_err(|error| format!("gsd_opencode_plugin_write: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("gsd_opencode_plugin_write: fallo en la tarea bloqueante: {error}"))?
 }
 
 /// Escreve `.opencode/alethe-gsd-config.json` com a cadeia de fallback de

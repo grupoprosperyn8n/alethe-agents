@@ -1,13 +1,26 @@
+import type { MessageKey } from './i18n'
 import type { TodoItem } from './types'
 
 export const TODO_TITLE_MAX_LENGTH = 200
 export const TODO_TAG_MAX_LENGTH = 24
 
+export const DEFAULT_TODO_KEYS = [
+  'todo.defaultReviewWorkspace',
+  'todo.defaultOpenReadme',
+  'todo.defaultPlanNextStep',
+] as const
+
 export const DEFAULT_TODOS: Omit<TodoItem, 'id'>[] = [
-  { title: 'Review active workspace', completed: false, tags: ['review'] },
-  { title: 'Open project README', completed: false, tags: ['docs'] },
-  { title: 'Plan next implementation step', completed: false, tags: ['plan'] },
+  { title: DEFAULT_TODO_KEYS[0], completed: false, tags: ['review'] },
+  { title: DEFAULT_TODO_KEYS[1], completed: false, tags: ['docs'] },
+  { title: DEFAULT_TODO_KEYS[2], completed: false, tags: ['plan'] },
 ]
+
+/** Resolve a default todo title key to its translated text. */
+export function translateDefaultTodoTitle(title: string, t: (key: MessageKey) => string): string {
+  if ((DEFAULT_TODO_KEYS as readonly string[]).includes(title)) return t(title as MessageKey)
+  return title
+}
 
 export function normalizeTodoTitle(value: unknown): string {
   if (typeof value !== 'string') return ''
