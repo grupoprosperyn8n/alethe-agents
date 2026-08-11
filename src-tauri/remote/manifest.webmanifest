@@ -1,7 +1,7 @@
 {
-  "name": "Alethe Remote",
-  "short_name": "Alethe",
-  "description": "Espacio de trabajo remoto por LAN de Alethe",
+  "name": "SO Multi Agente Remote",
+  "short_name": "SO Multi Agente",
+  "description": "Espacio de trabajo remoto por LAN de SO Multi Agente",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0e1014",
