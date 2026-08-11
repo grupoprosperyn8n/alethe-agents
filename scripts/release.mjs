@@ -3,7 +3,7 @@
  * Bump de versão + commit + tag + push. NÃO publica instaladores.
  *
  * Mantém em sincronia as 3 (4) fontes da versão:
- *   package.json · src-tauri/tauri.conf.json · src-tauri/Cargo.toml · src-tauri/Cargo.lock (bloco alethe)
+ *   package.json · src-tauri/tauri.conf.json · src-tauri/Cargo.toml · src-tauri/Cargo.lock (bloco so-multi-agente)
  *
  * Uso:
  *   npm run release            # patch:  1.2.0 -> 1.2.1  (o "último ponto")
@@ -17,6 +17,7 @@
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { execSync } from 'node:child_process'
+import { CRATE_RE, computeNextVersion, validateSources } from './release-lib.mjs'
 
 const args = process.argv.slice(2)
 const dryRun = args.includes('--dry-run')
@@ -50,18 +51,31 @@ if (!cur) fail(`Não achei a versão em ${PKG}`)
 const [major, minor, patch] = cur.slice(1).map(Number)
 const current = `${major}.${minor}.${patch}`
 
-// 3) Próxima versão.
+// 3) Validação prévia: todas as fontes (Cargo.lock incluído) ANTES de escrever.
+const sources = {
+  pkg: pkgRaw,
+  tauri: readFileSync(TAURI, 'utf8'),
+  cargo: readFileSync(CARGO, 'utf8'),
+  lock: existsSync(LOCK) ? readFileSync(LOCK, 'utf8') : '',
+}
+try {
+  validateSources(sources)
+} catch (e) {
+  fail(e.message)
+}
+
+// 4) Próxima versão.
 let next
-if (/^\d+\.\d+\.\d+$/.test(bumpArg)) next = bumpArg
-else if (bumpArg === 'major') next = `${major + 1}.0.0`
-else if (bumpArg === 'minor') next = `${major}.${minor + 1}.0`
-else if (bumpArg === 'patch') next = `${major}.${minor}.${patch + 1}`
-else fail(`Bump inválido: "${bumpArg}". Use: patch | minor | major | X.Y.Z`)
+try {
+  next = computeNextVersion(current, bumpArg)
+} catch (e) {
+  fail(e.message)
+}
 
 const tag = `v${next}`
 console.log(`\n  ${current}  →  ${next}   (tag ${tag})\n`)
 
-// 4) Reescreve a versão (primeira ocorrência) em cada arquivo.
+// 5) Reescreve a versão (primeira ocorrência) em cada arquivo.
 function bumpFile(path, regex, label = path) {
   const raw = readFileSync(path, 'utf8')
   const m = raw.match(regex)
@@ -74,14 +88,14 @@ bumpFile(PKG, /"version":\s*"(\d+\.\d+\.\d+)"/)
 bumpFile(TAURI, /"version":\s*"(\d+\.\d+\.\d+)"/)
 bumpFile(CARGO, /version\s*=\s*"(\d+\.\d+\.\d+)"/)
 
-// Cargo.lock: só o bloco do próprio crate (name = "alethe").
+// Cargo.lock: só o bloco do próprio crate (name = "so-multi-agente").
 const toAdd = [PKG, TAURI, CARGO]
 if (existsSync(LOCK)) {
-  bumpFile(LOCK, /name = "alethe"\r?\nversion = "(\d+\.\d+\.\d+)"/, LOCK)
+  bumpFile(LOCK, CRATE_RE, LOCK)
   toAdd.push(LOCK)
 }
 
-// 5) Commit + tag anotada + push (commit e tag), sem disparar release.
+// 6) Commit + tag anotada + push (commit e tag), sem disparar release.
 const branch = sh('git rev-parse --abbrev-ref HEAD')
 run(`git add ${toAdd.join(' ')}`)
 run(`git commit -m "chore(release): ${tag}"`)
