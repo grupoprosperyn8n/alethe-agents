@@ -99,7 +99,7 @@ fn emit(event_type: &str, meta: &MergeMeta, data: serde_json::Value) {
 
 fn build_prompt(meta: &MergeMeta, conflicts: &[ConflictFile]) -> String {
     let mut lines = vec![
-        "# Resolución de conflicto de merge (Alethe)".to_string(),
+        "# Resolución de conflicto de merge (SO Multi Agente)".to_string(),
         String::new(),
         format!("Merge de `{}` hacia `{}`. Este directorio es un entorno EFÍMERO solo para esta integración.", meta.source, meta.target),
         String::new(),
@@ -107,7 +107,7 @@ fn build_prompt(meta: &MergeMeta, conflicts: &[ConflictFile]) -> String {
         "- Resuelva SOLAMENTE los conflictos listados abajo. Nada más.".to_string(),
         "- NUNCA implemente funcionalidades, cambie requisitos ni arquitectura.".to_string(),
         "- Preserve la intención de las DOS ramas; confirme que nada se pierde.".to_string(),
-        "- Al terminar, solo guarde los archivos resueltos (sin commit — Alethe hace el commit después de validar).".to_string(),
+        "- Al terminar, solo guarde los archivos resueltos (sin commit — SO Multi Agente hace el commit después de validar).".to_string(),
         String::new(),
         "## Archivos en conflicto".to_string(),
     ];

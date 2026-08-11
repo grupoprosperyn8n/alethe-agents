@@ -235,7 +235,7 @@ export function useXtermSession(params: {
     if (!container) return
 
     if (import.meta.env.DEV) {
-      console.debug('[Alethe][xterm] mount', {
+      console.debug('[SO Multi Agente][xterm] mount', {
         sessionPersistenceKey,
         retryKey,
         ptyId: ptyIdRef.current,
@@ -608,14 +608,14 @@ export function useXtermSession(params: {
       try {
         fitAddon.fit()
       } catch (error) {
-        if (import.meta.env.DEV) console.error('[Alethe][xterm] fit failed', error)
+        if (import.meta.env.DEV) console.error('[SO Multi Agente][xterm] fit failed', error)
         // fit() pode falhar se o container não estiver visível
         return
       }
       try {
         terminal.refresh(0, Math.max(0, terminal.rows - 1))
       } catch (error) {
-        if (import.meta.env.DEV) console.error('[Alethe][xterm] refresh failed', error)
+        if (import.meta.env.DEV) console.error('[SO Multi Agente][xterm] refresh failed', error)
         /* refresh pode falhar durante teardown/layout invisível */
       }
       clampHorizontalScroll()
@@ -1383,7 +1383,7 @@ export function useXtermSession(params: {
 
     return () => {
       if (import.meta.env.DEV) {
-        console.debug('[Alethe][xterm] unmount', {
+        console.debug('[SO Multi Agente][xterm] unmount', {
           sessionPersistenceKey,
           retryKey,
           ptyId: ptyIdRef.current,

@@ -1,5 +1,5 @@
 name: Showcase submission
-description: Add something you built with Alethe to the Built with Alethe page
+description: Add something you built with SO Multi Agente to the Built with SO Multi Agente page
 labels: [showcase]
 body:
   - type: markdown
@@ -45,7 +45,7 @@ body:
   - type: textarea
     id: usage
     attributes:
-      label: How did Alethe fit into building it?
+      label: How did SO Multi Agente fit into building it?
       description: Optional, but the interesting part — how many agents, what kind of work, what it replaced.
     validations:
       required: false
