@@ -56,11 +56,11 @@ export function BranchTestingModal({
   const buildFeedbackSummary = () => {
     const lines = testingItems.map((item) => {
       const entry = feedback[item.id]
-      if (!entry || entry.state === 'pending') return `? ${item.text} (não verificado)`
+      if (!entry || entry.state === 'pending') return `? ${item.text} (no verificado)`
       if (entry.state === 'pass') return `✓ ${item.text}`
       return `✗ ${item.text}${entry.note.trim() ? ` — ${entry.note.trim()}` : ''}`
     })
-    return `Feedback de teste da branch "${branchName}":\n${lines.join('\n')}`
+    return `Feedback de prueba de la rama "${branchName}":\n${lines.join('\n')}`
   }
 
   return (

@@ -114,7 +114,7 @@ export function IntegrationsPage() {
       <SettingsSection id="spotify" title={t('prefs.spotify')} description={t('prefs.spotifyDesc')}>
         <div className={styles.integrationFields}>
           <label>
-            <span>Client ID</span>
+            <span>{t('prefs.spotifyClientId')}</span>
             <input
               className={controls.input}
               value={preferences.spotifyClientId}
@@ -123,7 +123,7 @@ export function IntegrationsPage() {
             />
           </label>
           <label>
-            <span>Client Secret</span>
+            <span>{t('prefs.spotifyClientSecret')}</span>
             <input
               className={controls.input}
               type="password"

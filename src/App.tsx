@@ -117,6 +117,7 @@ function LoadingScreen() {
 }
 
 function ToastItem({ toast }: { toast: InAppToast }) {
+  const t = useT()
   const dismissToast = useUiStore((s) => s.dismissToast)
   const uiTheme = useProjectsStore((s) => s.preferences.uiTheme)
 
@@ -146,8 +147,8 @@ function ToastItem({ toast }: { toast: InAppToast }) {
         type="button"
         className={styles.toastClose}
         onClick={() => dismissToast(toast.id)}
-        aria-label="Close notification"
-        title="Close"
+        aria-label={t('common.closeNotification')}
+        title={t('common.close')}
       >
         <X size={14} />
       </button>

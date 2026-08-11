@@ -242,12 +242,12 @@ fn reserve_spawn(
         SPAWN_COORDINATOR.get_or_init(|| (Mutex::new(HashSet::new()), Condvar::new()));
     let mut ids = spawning
         .lock()
-        .map_err(|_| "PTY spawn coordinator lock poisoned".to_string())?;
+        .map_err(|_| "el candado del coordinador de spawn de PTY está envenenado".to_string())?;
 
     loop {
         let already_spawned = sessions
             .lock()
-            .map_err(|_| "PTY sessions lock poisoned".to_string())?
+            .map_err(|_| "el candado de sesiones PTY está envenenado".to_string())?
             .contains_key(id);
         if already_spawned {
             return Ok(None);
@@ -257,7 +257,7 @@ fn reserve_spawn(
         }
         ids = ready
             .wait(ids)
-            .map_err(|_| "PTY spawn coordinator wait poisoned".to_string())?;
+            .map_err(|_| "la espera del coordinador de spawn de PTY falló (candado envenenado)".to_string())?;
     }
 }
 
@@ -294,7 +294,7 @@ pub struct PtyProcessSnapshot {
 pub fn pty_exists(sessions: State<'_, PtySessions>, id: String) -> Result<bool, String> {
     let sessions = sessions
         .lock()
-        .map_err(|_| "PTY sessions lock poisoned".to_string())?;
+        .map_err(|_| "el candado de sesiones PTY está envenenado".to_string())?;
     Ok(sessions.contains_key(&id))
 }
 
@@ -416,7 +416,7 @@ pub async fn spawn_pty(
                 None
             } else {
                 Some(format!(
-                    "\r\nWarning: cwd not found, using default directory: {cwd_value}\r\n"
+                    "\r\nAdvertencia: no se encontró el directorio de trabajo; se usará el directorio predeterminado: {cwd_value}\r\n"
                 ))
             }
         } else {
@@ -796,13 +796,13 @@ pub async fn spawn_pty(
 
         sessions
             .lock()
-            .map_err(|_| "PTY sessions lock poisoned".to_string())?
+            .map_err(|_| "el candado de sesiones PTY está envenenado".to_string())?
             .insert(id.clone(), session);
 
         Ok(SpawnPtyResponse { id })
     })
     .await
-    .map_err(|error| format!("spawn_pty: falha na task bloqueante: {error}"))?
+    .map_err(|error| format!("spawn_pty: fallo en la tarea bloqueante: {error}"))?
 }
 
 /// Mata a árvore de processos inteira (o filho direto + todos os descendentes) a
@@ -849,7 +849,7 @@ pub async fn restart_pty(
         let session = {
             let mut sessions = kill_sessions
                 .lock()
-                .map_err(|_| "PTY sessions lock poisoned".to_string())?;
+                .map_err(|_| "el candado de sesiones PTY está envenenado".to_string())?;
             sessions.remove(&kill_id)
         };
         if let Some(session) = session {
@@ -869,7 +869,7 @@ pub async fn restart_pty(
         delete_scrollback(&kill_app, &kill_id)
     })
     .await
-    .map_err(|error| format!("restart_pty: falha na task bloqueante: {error}"))??;
+    .map_err(|error| format!("restart_pty: fallo en la tarea bloqueante: {error}"))??;
 
     spawn_pty(
         app,
@@ -907,7 +907,7 @@ pub async fn attach_pty(
         {
             let sessions = sessions
                 .lock()
-                .map_err(|_| "PTY sessions lock poisoned".to_string())?;
+                .map_err(|_| "el candado de sesiones PTY está envenenado".to_string())?;
             if let Some(session) = sessions.get(&id) {
                 let mut buffer = session
                     .scrollback
@@ -930,7 +930,7 @@ pub async fn attach_pty(
         Ok(String::from_utf8_lossy(&bytes[start..]).into_owned())
     })
     .await
-    .map_err(|error| format!("attach_pty: falha na task bloqueante: {error}"))?
+    .map_err(|error| format!("attach_pty: fallo en la tarea bloqueante: {error}"))?
 }
 
 #[tauri::command]
@@ -950,10 +950,10 @@ pub async fn write_pty(
         let writer = {
             let sessions = sessions
                 .lock()
-                .map_err(|_| "PTY sessions lock poisoned".to_string())?;
+                .map_err(|_| "el candado de sesiones PTY está envenenado".to_string())?;
             let session = sessions
                 .get(&id)
-                .ok_or_else(|| format!("PTY not found: {id}"))?;
+                .ok_or_else(|| format!("PTY no encontrado: {id}"))?;
             Arc::clone(&session.writer)
         };
         let mut writer = writer
@@ -965,7 +965,7 @@ pub async fn write_pty(
         writer.flush().map_err(|error| error.to_string())
     })
     .await
-    .map_err(|error| format!("write_pty: falha na task bloqueante: {error}"))?
+    .map_err(|error| format!("write_pty: fallo en la tarea bloqueante: {error}"))?
 }
 
 #[tauri::command]
@@ -988,10 +988,10 @@ pub async fn resize_pty(
         let (master, writer, is_opencode, nudge_lock) = {
             let sessions = sessions
                 .lock()
-                .map_err(|_| "PTY sessions lock poisoned".to_string())?;
+                .map_err(|_| "el candado de sesiones PTY está envenenado".to_string())?;
             let session = sessions
                 .get(&id)
-                .ok_or_else(|| format!("PTY not found: {id}"))?;
+                .ok_or_else(|| format!("PTY no encontrado: {id}"))?;
             (
                 Arc::clone(&session.master),
                 Arc::clone(&session.writer),
@@ -1063,7 +1063,7 @@ pub async fn resize_pty(
         Ok(())
     })
     .await
-    .map_err(|error| format!("resize_pty: falha na task bloqueante: {error}"))?
+    .map_err(|error| format!("resize_pty: fallo en la tarea bloqueante: {error}"))?
 }
 
 fn terminate_session(session: PtySession) {
@@ -1106,7 +1106,7 @@ pub async fn kill_pty(
         let session = {
             let mut sessions = sessions
                 .lock()
-                .map_err(|_| "PTY sessions lock poisoned".to_string())?;
+                .map_err(|_| "el candado de sesiones PTY está envenenado".to_string())?;
             sessions.remove(&id)
         };
 
@@ -1118,7 +1118,7 @@ pub async fn kill_pty(
         delete_scrollback(&app, &id)
     })
     .await
-    .map_err(|error| format!("kill_pty: falha na task bloqueante: {error}"))?
+    .map_err(|error| format!("kill_pty: fallo en la tarea bloqueante: {error}"))?
 }
 
 /// Estaciona um runtime sem apagar scrollback nem identidade de sessão.
@@ -1129,7 +1129,7 @@ pub fn suspend_session(app: &AppHandle, sessions: &PtySessions, id: &str) -> Res
     let session = {
         let mut sessions = sessions
             .lock()
-            .map_err(|_| "PTY sessions lock poisoned".to_string())?;
+            .map_err(|_| "el candado de sesiones PTY está envenenado".to_string())?;
         sessions.remove(id)
     };
     let Some(session) = session else {
@@ -1198,7 +1198,7 @@ pub async fn suspend_pty(
     let sessions: PtySessions = Arc::clone(sessions.inner());
     tokio::task::spawn_blocking(move || suspend_session(&app, &sessions, &id))
         .await
-        .map_err(|error| format!("suspend_pty: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("suspend_pty: fallo en la tarea bloqueante: {error}"))?
 }
 
 #[tauri::command]
@@ -1236,7 +1236,7 @@ pub fn set_pty_read_state(
 ) -> Result<(), String> {
     let sessions = sessions
         .lock()
-        .map_err(|_| "PTY sessions lock poisoned".to_string())?;
+        .map_err(|_| "el candado de sesiones PTY está envenenado".to_string())?;
     if let Some(session) = sessions.get(&id) {
         let (lock, cvar) = &*session.read_active;
         if let Ok(mut read_active) = lock.lock() {
@@ -1261,7 +1261,7 @@ pub fn set_pty_visible(
 ) -> Result<(), String> {
     let sessions = sessions
         .lock()
-        .map_err(|_| "PTY sessions lock poisoned".to_string())?;
+        .map_err(|_| "el candado de sesiones PTY está envenenado".to_string())?;
     if let Some(session) = sessions.get(&id) {
         session.visible.store(visible, Ordering::Relaxed);
     }
@@ -1280,7 +1280,7 @@ pub async fn set_pty_priority(
         unsafe {
             let sessions = _sessions
                 .lock()
-                .map_err(|_| "PTY sessions lock poisoned".to_string())?;
+                .map_err(|_| "el candado de sesiones PTY está envenenado".to_string())?;
             if let Some(session) = sessions.get(&_id) {
                 if let Ok(child) = session.child.lock() {
                     if let Some(pid) = child.process_id() {
@@ -1307,7 +1307,7 @@ pub async fn set_pty_priority(
         Ok(())
     })
     .await
-    .map_err(|error| format!("set_pty_priority: falha na task bloqueante: {error}"))?
+    .map_err(|error| format!("set_pty_priority: fallo en la tarea bloqueante: {error}"))?
 }
 
 #[tauri::command]
@@ -1465,10 +1465,10 @@ fn wait_for_scrollback_writer() -> Result<(), String> {
     let (done_tx, done_rx) = std::sync::mpsc::channel();
     scrollback_writer()
         .send(ScrollbackWrite::Barrier(done_tx))
-        .map_err(|_| "scrollback writer unavailable".to_string())?;
+        .map_err(|_| "el escritor de scrollback no está disponible".to_string())?;
     done_rx
         .recv_timeout(std::time::Duration::from_secs(3))
-        .map_err(|_| "scrollback writer barrier timed out".to_string())
+        .map_err(|_| "tiempo de espera agotado en la barrera del escritor de scrollback".to_string())
 }
 
 pub fn push_scrollback(

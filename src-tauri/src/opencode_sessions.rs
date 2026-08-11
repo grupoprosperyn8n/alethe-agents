@@ -46,7 +46,7 @@ fn normalize_path(path: &str) -> String {
 pub async fn snapshot_opencode_sessions(cwd: String) -> Result<Vec<OpenCodeSessionSnapshot>, String> {
     tokio::task::spawn_blocking(move || snapshot_opencode_sessions_inner(cwd))
         .await
-        .map_err(|error| format!("snapshot_opencode_sessions: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("snapshot_opencode_sessions: fallo en la tarea bloqueante: {error}"))?
 }
 
 fn snapshot_opencode_sessions_inner(cwd: String) -> Result<Vec<OpenCodeSessionSnapshot>, String> {
@@ -60,11 +60,11 @@ fn snapshot_opencode_sessions_inner(cwd: String) -> Result<Vec<OpenCodeSessionSn
     }
     let output = command
         .output()
-        .map_err(|e| format!("falha ao executar opencode: {e}"))?;
+        .map_err(|e| format!("fallo al ejecutar opencode: {e}"))?;
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(format!("opencode session list falhou: {stderr}"));
+        return Err(format!("la lista de sesiones de opencode falló: {stderr}"));
     }
 
     let stdout = String::from_utf8_lossy(&output.stdout);
@@ -75,7 +75,7 @@ fn snapshot_opencode_sessions_inner(cwd: String) -> Result<Vec<OpenCodeSessionSn
         return Ok(Vec::new());
     }
     let entries: Vec<serde_json::Value> =
-        serde_json::from_str(&stdout).map_err(|e| format!("falha ao parsear JSON: {e}"))?;
+        serde_json::from_str(&stdout).map_err(|e| format!("fallo al analizar JSON: {e}"))?;
 
     let target = normalize_path(&cwd);
     let mut sessions: Vec<OpenCodeSessionSnapshot> = entries

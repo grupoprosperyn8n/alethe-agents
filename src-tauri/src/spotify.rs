@@ -70,7 +70,7 @@ fn resolve_credentials(
         .to_string();
     if cid.is_empty() || secret.is_empty() {
         return Err(
-            "spotify credentials not configured — set Client ID/Secret in Preferences"
+            "credenciales de Spotify no configuradas — establece Client ID/Secret en Preferencias"
                 .to_string(),
         );
     }
@@ -152,14 +152,14 @@ async fn exchange_code(code: &str, credentials: &SpotifyCredentials) -> Result<T
         ))
         .send()
         .await
-        .map_err(|e| format!("token request: {e}"))?;
+        .map_err(|e| format!("solicitud de token: {e}"))?;
     if !resp.status().is_success() {
         let body = resp.text().await.unwrap_or_default();
-        return Err(format!("token exchange failed: {body}"));
+        return Err(format!("fallo en el intercambio de token: {body}"));
     }
     resp.json::<TokenResponse>()
         .await
-        .map_err(|e| format!("token parse: {e}"))
+        .map_err(|e| format!("error al analizar el token: {e}"))
 }
 
 async fn refresh_token(
@@ -181,14 +181,14 @@ async fn refresh_token(
         ))
         .send()
         .await
-        .map_err(|e| format!("refresh request: {e}"))?;
+        .map_err(|e| format!("solicitud de renovación: {e}"))?;
     if !resp.status().is_success() {
         let body = resp.text().await.unwrap_or_default();
-        return Err(format!("refresh failed: {body}"));
+        return Err(format!("fallo al renovar el token: {body}"));
     }
     resp.json::<TokenResponse>()
         .await
-        .map_err(|e| format!("refresh parse: {e}"))
+        .map_err(|e| format!("error al analizar la renovación: {e}"))
 }
 
 async fn ensure_fresh_access_token(
@@ -251,17 +251,17 @@ fn wait_for_oauth_callback(expected_state: &str) -> Result<String, String> {
             }
         }
 
-        let success_html = b"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\n\r\n<html><body style='background:#0d0d0d;color:#e8e8e8;font-family:system-ui;display:grid;place-items:center;height:100vh;margin:0'><div style='text-align:center'><h1 style='font-weight:500'>Conectado ao Spotify</h1><p style='color:#888'>Pode fechar essa aba e voltar pro Alethe.</p></div></body></html>";
+        let success_html = b"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\n\r\n<html><body style='background:#0d0d0d;color:#e8e8e8;font-family:system-ui;display:grid;place-items:center;height:100vh;margin:0'><div style='text-align:center'><h1 style='font-weight:500'>Conectado a Spotify</h1><p style='color:#888'>Puedes cerrar esta pesta\xF1a y volver a Alethe.</p></div></body></html>";
         let _ = stream.write_all(success_html);
         let _ = stream.flush();
 
         if let Some(err) = error {
-            return Err(format!("authorize error: {err}"));
+            return Err(format!("error de autorización: {err}"));
         }
         if state.as_deref() != Some(expected_state) {
-            return Err("state mismatch — possível CSRF".to_string());
+            return Err("el estado no coincide — posible CSRF".to_string());
         }
-        return code.ok_or_else(|| "no code in callback".to_string());
+        return code.ok_or_else(|| "no se recibió código en la devolución de llamada".to_string());
     }
 }
 
@@ -279,7 +279,7 @@ pub async fn spotify_login(
         .compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst)
         .is_err()
     {
-        return Err("login already in progress".to_string());
+        return Err("ya hay un inicio de sesión en curso".to_string());
     }
     let _guard = LoginGuard;
 
@@ -299,21 +299,21 @@ pub async fn spotify_login(
         std::process::Command::new("rundll32")
             .args(["url.dll,FileProtocolHandler", &auth_url])
             .spawn()
-            .map_err(|e| format!("open browser: {e}"))?;
+            .map_err(|e| format!("no se pudo abrir el navegador: {e}"))?;
     }
     #[cfg(target_os = "macos")]
     {
         std::process::Command::new("open")
             .arg(&auth_url)
             .spawn()
-            .map_err(|e| format!("open browser: {e}"))?;
+            .map_err(|e| format!("no se pudo abrir el navegador: {e}"))?;
     }
     #[cfg(target_os = "linux")]
     {
         std::process::Command::new("xdg-open")
             .arg(&auth_url)
             .spawn()
-            .map_err(|e| format!("open browser: {e}"))?;
+            .map_err(|e| format!("no se pudo abrir el navegador: {e}"))?;
     }
 
     // Espera callback numa thread blocking pra não travar o runtime async
@@ -386,7 +386,7 @@ pub async fn spotify_get_current(
     }
     if !status.is_success() {
         let body = resp.text().await.unwrap_or_default();
-        return Err(format!("now playing failed ({status}): {body}"));
+        return Err(format!("fallo al obtener la reproducción actual ({status}): {body}"));
     }
 
     let json: serde_json::Value = resp.json().await.map_err(|e| e.to_string())?;

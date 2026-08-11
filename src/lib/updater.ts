@@ -1,6 +1,8 @@
 import { check, type Update } from '@tauri-apps/plugin-updater'
 import { relaunch } from '@tauri-apps/plugin-process'
 
+import { getLocale, translate } from './i18n'
+
 /** Metadados de um update disponível, prontos pra exibir na UI. */
 export type UpdateInfo = {
   version: string
@@ -45,7 +47,7 @@ export async function checkForUpdate(): Promise<UpdateInfo | null> {
 export async function installPendingUpdate(
   onProgress?: (progress: UpdateProgress) => void,
 ): Promise<void> {
-  if (!pending) throw new Error('Nenhum update pendente para instalar.')
+  if (!pending) throw new Error(translate(getLocale(), 'update.noPendingUpdate'))
   let total = 0
   let downloaded = 0
   await pending.downloadAndInstall((event) => {

@@ -82,7 +82,7 @@ pub(crate) fn session_meta_id(path: &Path) -> Option<String> {
 pub async fn snapshot_codex_sessions(cwd: String) -> Result<Vec<CodexSessionSnapshot>, String> {
     tokio::task::spawn_blocking(move || snapshot_codex_sessions_inner(cwd))
         .await
-        .map_err(|error| format!("snapshot_codex_sessions: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("snapshot_codex_sessions: fallo en la tarea bloqueante: {error}"))?
 }
 
 fn snapshot_codex_sessions_inner(cwd: String) -> Result<Vec<CodexSessionSnapshot>, String> {
@@ -92,7 +92,7 @@ fn snapshot_codex_sessions_inner(cwd: String) -> Result<Vec<CodexSessionSnapshot
     }
 
     let Some(root) = codex_sessions_dir() else {
-        return Err("USERPROFILE/HOME nao definido".to_string());
+        return Err("USERPROFILE/HOME no definido".to_string());
     };
     if !root.is_dir() {
         return Ok(Vec::new());

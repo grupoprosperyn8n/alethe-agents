@@ -82,10 +82,10 @@ fn fetch_usage() -> Result<CodexUsage, String> {
 
     let mut child = command
         .spawn()
-        .map_err(|e| format!("spawn failed: {e}"))?;
+        .map_err(|e| format!("fallo al iniciar el proceso: {e}"))?;
 
-    let mut stdin = child.stdin.take().ok_or("no stdin")?;
-    let stdout = child.stdout.take().ok_or("no stdout")?;
+    let mut stdin = child.stdin.take().ok_or("sin entrada estándar (stdin)")?;
+    let stdout = child.stdout.take().ok_or("sin salida estándar (stdout)")?;
 
     // Handshake + leitura dos limites. id=2 é a resposta que nos interessa.
     let requests = concat!(
@@ -98,8 +98,8 @@ fn fetch_usage() -> Result<CodexUsage, String> {
     );
     stdin
         .write_all(requests.as_bytes())
-        .map_err(|e| format!("write failed: {e}"))?;
-    stdin.flush().map_err(|e| format!("flush failed: {e}"))?;
+        .map_err(|e| format!("fallo al escribir: {e}"))?;
+    stdin.flush().map_err(|e| format!("fallo al vaciar el búfer: {e}"))?;
 
     // Lê o stdout numa thread pra poder aplicar timeout sem travar pra sempre.
     let (tx, rx) = mpsc::channel();
@@ -128,17 +128,17 @@ fn fetch_usage() -> Result<CodexUsage, String> {
     drop(stdin);
     let _ = reader_handle.join();
 
-    let message = received.map_err(|_| "timeout".to_string())?;
+    let message = received.map_err(|_| "tiempo de espera agotado".to_string())?;
 
     if let Some(err) = message.get("error") {
-        return Err(format!("rpc error: {err}"));
+        return Err(format!("error rpc: {err}"));
     }
 
-    let result = message.get("result").ok_or("no result")?;
+    let result = message.get("result").ok_or("sin resultado")?;
     let rate_limits = result
         .get("rateLimits")
         .filter(|v| !v.is_null())
-        .ok_or("no rate limits")?;
+        .ok_or("sin límites de uso")?;
 
     let plan = rate_limits
         .get("planType")
@@ -168,5 +168,5 @@ fn fetch_usage() -> Result<CodexUsage, String> {
 pub async fn get_codex_usage() -> Result<CodexUsage, String> {
     tokio::task::spawn_blocking(fetch_usage)
         .await
-        .map_err(|e| format!("join error: {e}"))?
+        .map_err(|e| format!("error al unir el hilo: {e}"))?
 }

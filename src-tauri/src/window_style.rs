@@ -40,9 +40,9 @@ fn round_macos_window(window: &tauri::WebviewWindow) -> Result<(), String> {
 
     let ns_window_ptr = window
         .ns_window()
-        .map_err(|e| format!("ns_window indisponível: {e}"))?;
+        .map_err(|e| format!("ns_window no disponible: {e}"))?;
     if ns_window_ptr.is_null() {
-        return Err("ns_window retornou ponteiro nulo".into());
+        return Err("ns_window devolvió puntero nulo".into());
     }
 
     // SAFETY: ns_window_ptr é uma NSWindow* válida fornecida pelo Tauri. Todas
@@ -70,7 +70,7 @@ fn round_macos_window(window: &tauri::WebviewWindow) -> Result<(), String> {
         let _: () = objc2::msg_send![content, setWantsLayer: true];
         let layer: *mut AnyObject = objc2::msg_send![content, layer];
         if layer.is_null() {
-            return Err("layer do contentView nula".into());
+            return Err("layer del contentView nula".into());
         }
         let _: () = objc2::msg_send![layer, setCornerRadius: CORNER_RADIUS];
         let _: () = objc2::msg_send![layer, setMasksToBounds: true];

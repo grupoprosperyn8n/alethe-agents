@@ -119,8 +119,8 @@ export function PreferencesModal() {
       },
       {
         id: 'multiagent',
-        label: 'Multi-Agent & Telemetry',
-        description: 'Real-time metrics, event traces, and structured logs.',
+        label: t('prefs.categoryMultiagent'),
+        description: t('prefs.categoryMultiagentDesc'),
         Icon: Activity,
       },
       {
@@ -267,7 +267,7 @@ export function PreferencesModal() {
         target: 'discord',
         label: t('prefs.discordPresence'),
         description: t('prefs.discordPresenceHint'),
-        keywords: 'discord rich presence status integração',
+        keywords: 'discord rich presence status integração integración presencia',
       },
       {
         category: 'integrations',
@@ -281,14 +281,14 @@ export function PreferencesModal() {
         target: 'app-version',
         label: t('prefs.aboutVersionTitle'),
         description: t('prefs.aboutVersionDesc'),
-        keywords: 'version versão about sobre build info app',
+        keywords: 'version versão about sobre build info app versión',
       },
       {
         category: 'about',
         target: 'app-updates',
         label: t('prefs.aboutUpdatesTitle'),
         description: t('prefs.aboutUpdatesDesc'),
-        keywords: 'update atualização atualizar upgrade nova versão release check',
+        keywords: 'update atualização atualizar upgrade nova versão release check actualización versión nueva',
       },
     ],
     [t],

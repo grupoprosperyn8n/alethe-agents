@@ -42,7 +42,10 @@ export const DiffPane = memo(function DiffPane({ projectId, terminal }: DiffPane
       } catch (err: unknown) {
         if (!cancelled) {
           const raw = err instanceof Error ? err.message : String(err)
-          const errMsg = raw.includes('Binary file') ? t('diff.error.binary') : raw
+          const errMsg =
+            raw.includes('El archivo binario') || raw.includes('Binary file')
+              ? t('diff.error.binary')
+              : raw
           setError(errMsg)
           pushToast({ title: t('diff.error.generic'), body: errMsg })
         }

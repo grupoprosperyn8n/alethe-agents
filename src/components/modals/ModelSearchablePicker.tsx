@@ -104,10 +104,10 @@ export function ModelSearchablePicker({
           <Sparkles size={14} color="var(--accent)" style={{ flexShrink: 0 }} />
           <span className={styles.triggerText}>
             {loading
-              ? 'Carregando modelos do CLI...'
+              ? 'Cargando modelos del CLI...'
               : selected
               ? `${selected.label}`
-              : `Selecione um modelo (${providerName})`}
+              : `Seleccione un modelo (${providerName})`}
           </span>
         </span>
         <ChevronDown size={14} style={{ flexShrink: 0, opacity: 0.7 }} />

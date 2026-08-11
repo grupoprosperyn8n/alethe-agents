@@ -140,13 +140,13 @@ export function EditProjectModal() {
   const handleRemoveWorktree = async (agentId: string) => {
     const repoPath = project.terminals[0]?.cwd
     if (!repoPath) return
-    if (confirm(`Tem certeza que deseja excluir o ambiente do agente "${agentId}"?`)) {
+    if (confirm(t('crud.editProjectConfirmRemoveAgentEnv', { agentId }))) {
       try {
         await worktreeRemove(repoPath, agentId, true)
         void loadWorktrees(repoPath)
       } catch (err) {
         console.error('Falha ao excluir worktree:', err)
-        alert('Erro ao excluir: ' + err)
+        alert(t('crud.editProjectRemoveAgentEnvFailed', { error: String(err) }))
       }
     }
   }
@@ -450,14 +450,14 @@ export function EditProjectModal() {
       {/* --- RFC-003 Worktrees Ativos --- */}
       <hr style={{ margin: '20px 0 16px', border: 'none', borderTop: '1px solid var(--border)' }} />
       <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}>
-        Ambientes de Agentes Ativos (Worktrees)
+        Ambientes de Agentes Activos (Worktrees)
       </h3>
 
       {loadingWorktrees ? (
-        <div style={{ fontSize: 11, color: 'var(--fg-muted)' }}>Carregando worktrees...</div>
+        <div style={{ fontSize: 11, color: 'var(--fg-muted)' }}>Cargando worktrees...</div>
       ) : worktrees.length === 0 ? (
         <div style={{ fontSize: 11, color: 'var(--fg-muted)', fontStyle: 'italic' }}>
-          No active worktrees or copies for this project.
+          No hay worktrees ni copias activas para este proyecto.
         </div>
       ) : (
         <div
@@ -485,7 +485,10 @@ export function EditProjectModal() {
             >
               <div style={{ overflow: 'hidden', marginRight: 12 }}>
                 <div style={{ fontWeight: 600 }}>
-                  Agent: {wt.agentId} ({wt.mode === 'gitWorktree' ? 'Worktree' : 'Copy'})
+                  {t('multiAgent.agentWorktreeLabel', {
+                    agentId: wt.agentId,
+                    mode: wt.mode === 'gitWorktree' ? t('multiAgent.modeWorktree') : t('multiAgent.modeCopy'),
+                  })}
                 </div>
                 <div
                   style={{
@@ -638,7 +641,7 @@ export function EditProjectModal() {
           </div>
 
           <div className={controls.field} style={{ marginTop: 8 }}>
-            <label className={controls.label}>Ação pós-Merge do Agente</label>
+            <label className={controls.label}>Acción posterior al merge del agente</label>
             <div style={{ display: 'flex', gap: 16, marginTop: 4 }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer' }}>
                 <input
@@ -648,7 +651,7 @@ export function EditProjectModal() {
                   checked={mergePostAction === 'relocateToNewBranch'}
                   onChange={() => setMergePostActionState('relocateToNewBranch')}
                 />
-                Criar nova branch e manter chat ativo
+                Crear nueva rama y mantener el chat activo
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer' }}>
                 <input

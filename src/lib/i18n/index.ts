@@ -1,7 +1,8 @@
+import type { AgentType } from '../types'
 import { useProjectsStore } from '../../stores/projectsStore'
-import { en, type MessageKey } from './messages/en'
+import { es, type MessageKey } from './messages/es'
 import { ptBR } from './messages/pt-BR'
-import { es } from './messages/es'
+import { en } from './messages/en'
 
 export type { MessageKey }
 
@@ -66,4 +67,25 @@ export type TFunction = (key: MessageKey, params?: Params) => string
 export function useT(): TFunction {
   const locale = useProjectsStore((s) => s.preferences.language)
   return (key, params) => translate(locale, key, params)
+}
+
+const AGENT_LABEL_KEYS: Record<AgentType, MessageKey> = {
+  claude: 'agent.claude.label',
+  codex: 'agent.codex.label',
+  opencode: 'agent.opencode.label',
+  antigravity: 'agent.antigravity.label',
+  hermes: 'agent.hermes.label',
+  pi: 'agent.pi.label',
+  shell: 'agent.shell.label',
+}
+
+/** Label traduzido de um agente. Nomes próprios de produtos são preservados; `shell` vira "Terminal" no espanhol. */
+export function getAgentLabel(locale: Locale, agent: AgentType): string {
+  return translate(locale, AGENT_LABEL_KEYS[agent])
+}
+
+/** Hook de label de agente. */
+export function useAgentLabel(): (agent: AgentType) => string {
+  const locale = useProjectsStore((s) => s.preferences.language)
+  return (agent) => translate(locale, AGENT_LABEL_KEYS[agent])
 }

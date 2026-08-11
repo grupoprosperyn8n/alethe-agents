@@ -141,9 +141,9 @@ mod imp {
     ) -> Result<Retained<NSView>, String> {
         let ns_window_ptr = window
             .ns_window()
-            .map_err(|e| format!("ns_window indisponível: {e}"))?;
+            .map_err(|e| format!("ns_window no disponible: {e}"))?;
         if ns_window_ptr.is_null() {
-            return Err("ns_window retornou ponteiro nulo".into());
+            return Err("ns_window devolvió puntero nulo".into());
         }
         // SAFETY: ns_window_ptr é uma NSWindow* válida fornecida pelo Tauri.
         unsafe {
@@ -152,7 +152,7 @@ mod imp {
             if content.is_null() {
                 return Err("contentView nula".into());
             }
-            Retained::retain(content).ok_or_else(|| "falha ao reter contentView".into())
+            Retained::retain(content).ok_or_else(|| "fallo al retener contentView".into())
         }
     }
 
@@ -164,7 +164,7 @@ mod imp {
         command: Option<String>,
     ) -> Result<GhosttySurfaceResponse, String> {
         let mtm = MainThreadMarker::new()
-            .ok_or_else(|| "ghostty_spawn precisa rodar na main thread".to_string())?;
+            .ok_or_else(|| "ghostty_spawn debe ejecutarse en el hilo principal".to_string())?;
         let _ = (&cwd, &command); // usados só no caminho ghostty_linked
 
         // Idempotente + atômico (#4): reserva o id sob lock. Se já há surface
@@ -192,7 +192,7 @@ mod imp {
 
         let window = app
             .get_webview_window("main")
-            .ok_or_else(|| "janela 'main' não encontrada".to_string())?;
+            .ok_or_else(|| "ventana 'main' no encontrada".to_string())?;
         let content = content_view(&window, mtm)?;
 
         // Modo REAL: o shim cria a NSView de input + a surface dentro da content
@@ -222,7 +222,7 @@ mod imp {
             };
             if s.is_null() {
                 eprintln!("[alethe-ghostty] surface_new FALHOU id={id}");
-                return Err("ghostty_surface_new retornou null".into());
+                return Err("ghostty_surface_new devolvió null".into());
             }
             eprintln!("[alethe-ghostty] surface criada id={id}");
 
@@ -345,17 +345,17 @@ mod imp {
         scale: f64,
     ) -> Result<(), String> {
         let mtm = MainThreadMarker::new()
-            .ok_or_else(|| "ghostty_sync_frame precisa rodar na main thread".to_string())?;
+            .ok_or_else(|| "ghostty_sync_frame debe ejecutarse en el hilo principal".to_string())?;
         let window = app
             .get_webview_window("main")
-            .ok_or_else(|| "janela 'main' não encontrada".to_string())?;
+            .ok_or_else(|| "ventana 'main' no encontrada".to_string())?;
         let content = content_view(&window, mtm)?;
         let content_height = content.frame().size.height;
 
         let mut views = state.views.lock().map_err(|_| "lock poisoned".to_string())?;
         let entry = views
             .get_mut(&id)
-            .ok_or_else(|| format!("surface não encontrada: {id}"))?;
+            .ok_or_else(|| format!("surface no encontrada: {id}"))?;
         let frame = web_rect_to_appkit_frame(content_height, rect);
         entry.last_scale = scale;
 
@@ -394,7 +394,7 @@ mod imp {
         hidden: bool,
     ) -> Result<(), String> {
         let _mtm = MainThreadMarker::new()
-            .ok_or_else(|| "ghostty_set_hidden precisa rodar na main thread".to_string())?;
+            .ok_or_else(|| "ghostty_set_hidden debe ejecutarse en el hilo principal".to_string())?;
         let mut views = state.views.lock().map_err(|_| "lock poisoned".to_string())?;
         if let Some(entry) = views.get_mut(&id) {
             #[cfg(ghostty_linked)]
@@ -418,7 +418,7 @@ mod imp {
     /// isso, surfaces antigas ficam empilhadas e roubam o foco do teclado.
     pub fn kill_all(state: &State<'_, GhosttyState>) -> Result<(), String> {
         let _mtm = MainThreadMarker::new()
-            .ok_or_else(|| "ghostty_kill_all precisa rodar na main thread".to_string())?;
+            .ok_or_else(|| "ghostty_kill_all debe ejecutarse en el hilo principal".to_string())?;
         #[cfg(ghostty_linked)]
         {
             use crate::ghostty_ffi::*;
@@ -450,10 +450,10 @@ mod imp {
         use crate::ghostty_ffi::*;
         use std::ffi::CString;
         let _mtm = MainThreadMarker::new()
-            .ok_or_else(|| "precisa rodar na main thread".to_string())?;
+            .ok_or_else(|| "debe ejecutarse en el hilo principal".to_string())?;
         let surface = {
             let views = state.views.lock().map_err(|_| "lock poisoned".to_string())?;
-            let e = views.get(&id).ok_or_else(|| format!("surface {id} não encontrada"))?;
+            let e = views.get(&id).ok_or_else(|| format!("surface {id} no encontrada"))?;
             e.surface
         };
         if surface.is_null() {
@@ -488,7 +488,7 @@ mod imp {
         focused: bool,
     ) -> Result<(), String> {
         let _mtm = MainThreadMarker::new()
-            .ok_or_else(|| "ghostty_set_focus precisa rodar na main thread".to_string())?;
+            .ok_or_else(|| "ghostty_set_focus debe ejecutarse en el hilo principal".to_string())?;
         let mut views = state.views.lock().map_err(|_| "lock poisoned".to_string())?;
         if let Some(entry) = views.get_mut(&id) {
             #[cfg(ghostty_linked)]
@@ -510,7 +510,7 @@ mod imp {
 
     pub fn process_exited(state: &State<'_, GhosttyState>, id: String) -> Result<bool, String> {
         let _mtm = MainThreadMarker::new()
-            .ok_or_else(|| "ghostty_process_exited precisa rodar na main thread".to_string())?;
+            .ok_or_else(|| "ghostty_process_exited debe ejecutarse en el hilo principal".to_string())?;
         let views = state.views.lock().map_err(|_| "lock poisoned".to_string())?;
         match views.get(&id) {
             #[cfg(ghostty_linked)]
@@ -531,7 +531,7 @@ mod imp {
 
     pub fn kill(state: &State<'_, GhosttyState>, id: String) -> Result<(), String> {
         let _mtm = MainThreadMarker::new()
-            .ok_or_else(|| "ghostty_kill precisa rodar na main thread".to_string())?;
+            .ok_or_else(|| "ghostty_kill debe ejecutarse en el hilo principal".to_string())?;
         let mut views = state.views.lock().map_err(|_| "lock poisoned".to_string())?;
         if let Some(entry) = views.remove(&id) {
             #[cfg(ghostty_linked)]
@@ -989,7 +989,7 @@ mod imp {
     pub struct GhosttySurfaces;
     pub type GhosttyState = GhosttySurfaces;
 
-    const UNSUPPORTED: &str = "terminal nativo (Ghostty) só é suportado no macOS";
+    const UNSUPPORTED: &str = "el terminal nativo (Ghostty) solo es compatible con macOS";
 
     pub fn spawn(
         _app: &tauri::AppHandle,
@@ -1120,6 +1120,6 @@ pub fn ghostty_debug_send_read(
     #[cfg(not(all(target_os = "macos", ghostty_linked)))]
     {
         let _ = (&state, &id, &text);
-        Err("ghostty_debug_send_read indisponível (precisa macOS + libghostty)".into())
+        Err("ghostty_debug_send_read no disponible (requiere macOS + libghostty)".into())
     }
 }

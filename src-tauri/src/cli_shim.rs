@@ -50,13 +50,13 @@ fn shim_bin_dir() -> Result<PathBuf, String> {
     #[cfg(windows)]
     {
         let base = dirs_next::data_local_dir()
-            .ok_or_else(|| "não foi possível resolver LOCALAPPDATA".to_string())?;
+            .ok_or_else(|| "no fue posible resolver LOCALAPPDATA".to_string())?;
         Ok(base.join("Alethe").join("bin"))
     }
     #[cfg(not(windows))]
     {
         let home =
-            dirs_next::home_dir().ok_or_else(|| "não foi possível resolver o HOME".to_string())?;
+            dirs_next::home_dir().ok_or_else(|| "no fue posible resolver el HOME".to_string())?;
         Ok(home.join(".local").join("bin"))
     }
 }
@@ -109,15 +109,15 @@ fn sh_single_quote(value: &str) -> String {
 fn unix_shim_script(target_marker: &str, launch: &str) -> String {
     format!(
         r#"#!/bin/sh
-# alethe — abre um diretório no Alethe a partir do terminal.
+# alethe — abre un directorio en Alethe desde la terminal.
 #
-# Gerado automaticamente pelo Alethe (Configurações ▸ Integrações ▸ Comando de
-# terminal). Não edite à mão: reinstale por lá, principalmente depois de mover
-# ou reinstalar o app.
+# Generado automáticamente por Alethe (Configuración ▸ Integraciones ▸ Comando de
+# terminal). No lo edites a mano: reinstálalo desde allí, sobre todo después de
+# mover o reinstalar la app.
 #
-# alethe            → abre o diretório atual
+# alethe            → abre el directorio actual
 # alethe .          → idem
-# alethe ~/projeto  → abre o diretório informado
+# alethe ~/proyecto → abre el directorio indicado
 #
 # ALETHE_TARGET_BIN: {target_marker}
 
@@ -126,11 +126,11 @@ set -e
 target=${{1:-.}}
 
 if [ ! -d "$target" ]; then
-  echo "alethe: diretório não encontrado: $target" >&2
+  echo "alethe: directorio no encontrado: $target" >&2
   exit 1
 fi
 
-# Caminho absoluto: o app compara com o cwd salvo dos projetos.
+# Ruta absoluta: la app la compara con el cwd guardado de los proyectos.
 target=$(cd "$target" && pwd)
 
 {launch}
@@ -178,11 +178,11 @@ fn render_shim(binary: &Path) -> Result<String, String> {
         let binary = binary.to_string_lossy().to_string();
         return Ok(format!(
             r#"@echo off
-rem alethe - abre um diretorio no Alethe a partir do terminal.
+rem alethe - abre un directorio en Alethe desde la terminal.
 rem
-rem Gerado automaticamente pelo Alethe (Configuracoes > Integracoes > Comando de
-rem terminal). Nao edite a mao: reinstale por la, principalmente depois de mover
-rem ou reinstalar o app.
+rem Generado automáticamente por Alethe (Configuración > Integraciones > Comando
+rem de terminal). No lo edites a mano: reinstálalo desde allí, sobre todo
+rem después de mover o reinstalar la app.
 rem
 rem ALETHE_TARGET_BIN: {binary}
 
@@ -190,11 +190,11 @@ setlocal
 set "target=%~1"
 if "%target%"=="" set "target=%CD%"
 
-rem Caminho absoluto: o app compara com o cwd salvo dos projetos.
+rem Ruta absoluta: la app la compara con el cwd guardado de los proyectos.
 for %%I in ("%target%") do set "target=%%~fI"
 
 if not exist "%target%\" (
-  echo alethe: diretorio nao encontrado: %target% 1>&2
+  echo alethe: directorio no encontrado: %target% 1>&2
   exit /b 1
 )
 
@@ -206,7 +206,7 @@ start "" "{binary}" --open-path "%target%"
     #[cfg(not(any(unix, windows)))]
     {
         let _ = binary;
-        Err("plataforma sem suporte a comando de terminal".to_string())
+        Err("plataforma sin soporte para comando de terminal".to_string())
     }
 }
 

@@ -78,12 +78,12 @@ export function ImageInput({
             fontSize: 18,
           }}
           className={isRainbow ? 'swatch-rgb-rainbow' : undefined}
-          title={value ? 'Preview da Foto/Ícone' : 'Foto Padrão'}
+          title={value ? t('image.previewTitle') : t('image.defaultPhotoTitle')}
         >
           {value ? (
             <img
               src={value}
-              alt="Icon Preview"
+              alt={t('image.iconPreviewAlt')}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               onError={(e) => {
                 e.currentTarget.style.display = 'none'

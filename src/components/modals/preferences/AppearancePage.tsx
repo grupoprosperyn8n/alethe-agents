@@ -50,14 +50,14 @@ export function AppearancePage() {
 
       <SettingsSection
         id="app-icon-theme"
-        title="App icon theme"
-        description="Choose the native desktop icon independently from the interface theme."
+        title={t('prefs.appIconThemeTitle')}
+        description={t('prefs.appIconThemeDesc')}
       >
         <Dropdown
           className={styles.select}
           value={preferences.appIconTheme}
           onChange={(value) => setPreferences({ appIconTheme: value as AppIconTheme })}
-          ariaLabel="App icon theme"
+          ariaLabel={t('prefs.appIconThemeAria')}
           options={[
             ...THEME_OPTIONS.map((theme) => ({ value: theme.id, label: themeLabel(t, theme.id) })),
             { value: 'alethe-blue-gradient', label: 'Alethe Blue Gradient' },

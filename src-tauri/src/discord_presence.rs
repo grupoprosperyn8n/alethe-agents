@@ -105,7 +105,7 @@ pub fn set_discord_presence(
             state,
             started_at,
         })
-        .map_err(|_| "Discord presence worker is unavailable".to_string())
+        .map_err(|_| "el worker de presencia de Discord no está disponible".to_string())
 }
 
 #[tauri::command]
@@ -113,7 +113,7 @@ pub fn clear_discord_presence(presence: State<'_, DiscordPresence>) -> Result<()
     presence
         .sender
         .send(PresenceCommand::Clear)
-        .map_err(|_| "Discord presence worker is unavailable".to_string())
+        .map_err(|_| "el worker de presencia de Discord no está disponible".to_string())
 }
 
 #[cfg(test)]

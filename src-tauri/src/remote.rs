@@ -345,7 +345,7 @@ fn handle_websocket(stream: TcpStream, hub: Arc<RemoteHub>, sessions: PtySession
         }
         if let Some(id) = client_id {
             if hub.client_expired(id) {
-                let _ = socket.send(Message::Text(json!({ "type": "error", "message": "Remote session expired" }).to_string().into()));
+                let _ = socket.send(Message::Text(json!({ "type": "error", "message": "la sesión remota expiró" }).to_string().into()));
                 break;
             }
         }
@@ -356,13 +356,13 @@ fn handle_websocket(stream: TcpStream, hub: Arc<RemoteHub>, sessions: PtySession
                     command.get("token").and_then(Value::as_str).map(|provided| tokens_equal(provided, &token))
                 }).unwrap_or(false);
                 if !valid_token {
-                    let _ = socket.send(Message::Text(json!({ "type": "error", "message": "Invalid pairing token" }).to_string().into()));
+                    let _ = socket.send(Message::Text(json!({ "type": "error", "message": "token de emparejamiento inválido" }).to_string().into()));
                     continue;
                 }
                 if client_id.is_none() {
-                    let name = command.get("deviceName").and_then(Value::as_str).unwrap_or("Remote device").chars().take(48).collect();
+                    let name = command.get("deviceName").and_then(Value::as_str).unwrap_or("Dispositivo remoto").chars().take(48).collect();
                     let Some(id) = hub.try_register_client(tx.clone(), name, address.clone()) else {
-                        let _ = socket.send(Message::Text(json!({ "type": "error", "message": "Maximum remote devices reached" }).to_string().into()));
+                        let _ = socket.send(Message::Text(json!({ "type": "error", "message": "Se alcanzó el máximo de dispositivos remotos" }).to_string().into()));
                         break;
                     };
                     client_id = Some(id);
@@ -409,7 +409,7 @@ fn handle_http(
         token.as_deref().map(|provided| tokens_equal(provided, &expected))
     }).unwrap_or(false);
     if path.starts_with("/api/") && !valid_token {
-        return respond(stream, 401, "application/json", r#"{"error":"Invalid pairing token"}"#);
+        return respond(stream, 401, "application/json", r#"{"error":"token de emparejamiento inválido"}"#);
     }
     if path.starts_with("/api/info") {
         return respond(stream, 200, "application/json", &serde_json::to_string(&hub.info()).map_err(|e| e.to_string())?);
@@ -419,7 +419,7 @@ fn handle_http(
         return respond(stream, 200, "application/json", &state.to_string());
     }
     if path.starts_with("/api/scrollback") {
-        let id = query_value(path, "id").ok_or_else(|| "Missing PTY id".to_string())?;
+        let id = query_value(path, "id").ok_or_else(|| "falta el id del PTY".to_string())?;
         let text = read_scrollback(sessions, &id, 512 * 1024);
         return respond(stream, 200, "application/json", &json!({ "text": text }).to_string());
     }
@@ -427,7 +427,7 @@ fn handle_http(
         let payload: RemoteMessage = serde_json::from_str(body).map_err(|e| e.to_string())?;
         let text = sanitize_remote_message(&payload.text);
         if text.trim().is_empty() || text.len() > MAX_MESSAGE {
-            return respond(stream, 400, "application/json", r#"{"error":"Message is empty or too large"}"#);
+            return respond(stream, 400, "application/json", r#"{"error":"El mensaje está vacío o es demasiado grande"}"#);
         }
         write_remote(sessions, &payload.pty_id, &format!("{}\r", text.trim()))?;
         return respond(stream, 204, "text/plain", "");
@@ -437,7 +437,7 @@ fn handle_http(
         "/app.js" => respond(stream, 200, "text/javascript; charset=utf-8", include_str!("../remote/app.js")),
         "/app.css" => respond(stream, 200, "text/css; charset=utf-8", include_str!("../remote/app.css")),
         "/manifest.webmanifest" => respond(stream, 200, "application/manifest+json", include_str!("../remote/manifest.webmanifest")),
-        _ => respond(stream, 404, "text/plain", "Not found"),
+        _ => respond(stream, 404, "text/plain", "No encontrado"),
     }
 }
 
@@ -491,7 +491,7 @@ fn read_scrollback(sessions: &PtySessions, id: &str, max_bytes: usize) -> String
 fn write_remote(sessions: &PtySessions, id: &str, data: &str) -> Result<(), String> {
     let writer = {
         let sessions = sessions.lock().map_err(|_| "PTY sessions lock poisoned".to_string())?;
-        let session = sessions.get(id).ok_or_else(|| "PTY not found".to_string())?;
+        let session = sessions.get(id).ok_or_else(|| "PTY no encontrado".to_string())?;
         Arc::clone(&session.writer)
     };
     let mut writer = writer.lock().map_err(|_| "PTY writer lock poisoned".to_string())?;
@@ -500,8 +500,8 @@ fn write_remote(sessions: &PtySessions, id: &str, data: &str) -> Result<(), Stri
 }
 
 fn respond(stream: &mut TcpStream, status: u16, content_type: &str, body: &str) -> Result<(), String> {
-    if body.len() > MAX_BODY { return Err("Response too large".into()); }
-    let reason = match status { 200 => "OK", 204 => "No Content", 400 => "Bad Request", 401 => "Unauthorized", 404 => "Not Found", _ => "Error" };
+    if body.len() > MAX_BODY { return Err("Respuesta demasiado grande".into()); }
+    let reason = match status { 200 => "OK", 204 => "Sin contenido", 400 => "Solicitud incorrecta", 401 => "No autorizado", 404 => "No encontrado", _ => "Error" };
     let response = format!("HTTP/1.1 {status} {reason}\r\nContent-Type: {content_type}\r\nContent-Length: {}\r\nConnection: close\r\nCache-Control: no-store\r\nReferrer-Policy: no-referrer\r\nX-Content-Type-Options: nosniff\r\nContent-Security-Policy: default-src 'self'; connect-src 'self' ws:; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; frame-ancestors 'none'\r\n\r\n{body}", body.as_bytes().len());
     stream.write_all(response.as_bytes()).map_err(|e| e.to_string())
 }

@@ -69,7 +69,7 @@ pub fn profile_data_dir_for_id(app: &AppHandle, profile_id: &str) -> Result<Path
     let root = root_data_dir(app)?;
     let index = ensure_profiles_index(app)?;
     if !index.profiles.iter().any(|profile| profile.id == profile_id) {
-        return Err("profile not found".to_string());
+        return Err("perfil no encontrado".to_string());
     }
     Ok(profile_dir(&root, profile_id))
 }
@@ -92,7 +92,7 @@ pub fn default_profiles_index() -> ProfilesIndex {
 pub fn parse_profiles_index(raw: &str) -> Result<ProfilesIndex, String> {
     let mut index: ProfilesIndex = serde_json::from_str(raw).map_err(|error| error.to_string())?;
     if index.version != 1 {
-        return Err(format!("unsupported profiles index version: {}", index.version));
+        return Err(format!("versión de índice de perfiles no compatible: {}", index.version));
     }
     if index.profiles.is_empty() {
         return Ok(default_profiles_index());
@@ -375,7 +375,7 @@ pub fn set_active_profile_id(app: &AppHandle, profile_id: &str) -> Result<Profil
     let root = root_data_dir(app)?;
     let mut index = ensure_profiles_index(app)?;
     if !index.profiles.iter().any(|profile| profile.id == profile_id) {
-        return Err(format!("profile not found: {profile_id}"));
+        return Err(format!("perfil no encontrado: {profile_id}"));
     }
     let now = now_ms();
     index.active_profile_id = profile_id.to_string();
@@ -438,7 +438,7 @@ pub fn rename_profile_state(
         }
     }
     if !found {
-        return Err(format!("profile not found: {profile_id}"));
+        return Err(format!("perfil no encontrado: {profile_id}"));
     }
     ensure_profile_dirs(&root, &index)?;
     write_profiles_index(&root, &index)?;
@@ -449,14 +449,14 @@ pub fn delete_profile_state(app: &AppHandle, profile_id: &str) -> Result<Profile
     let root = root_data_dir(app)?;
     let mut index = ensure_profiles_index(app)?;
     if index.profiles.len() <= 1 {
-        return Err("cannot delete the last local profile".to_string());
+        return Err("no se puede eliminar el último perfil local".to_string());
     }
     let target = index
         .profiles
         .iter()
         .find(|profile| profile.id == profile_id)
         .cloned()
-        .ok_or_else(|| format!("profile not found: {profile_id}"))?;
+        .ok_or_else(|| format!("perfil no encontrado: {profile_id}"))?;
     let target_dir = profile_dir(&root, &target.id);
     if target_dir.exists() {
         fs::remove_dir_all(&target_dir).map_err(|error| error.to_string())?;
@@ -470,7 +470,7 @@ pub fn delete_profile_state(app: &AppHandle, profile_id: &str) -> Result<Profile
             .find(|profile| profile.id == DEFAULT_PROFILE_ID)
             .or_else(|| index.profiles.first())
             .cloned()
-            .ok_or_else(|| "no fallback profile available".to_string())?;
+            .ok_or_else(|| "no hay perfil de respaldo disponible".to_string())?;
         index.active_profile_id = fallback.id.clone();
         for profile in &mut index.profiles {
             if profile.id == fallback.id {
@@ -490,7 +490,7 @@ pub fn active_profile_state(app: &AppHandle) -> Result<ProfileMeta, String> {
         .profiles
         .into_iter()
         .find(|profile| profile.id == active_profile_id)
-        .ok_or_else(|| "active profile not found".to_string())
+        .ok_or_else(|| "perfil activo no encontrado".to_string())
 }
 
 #[tauri::command]

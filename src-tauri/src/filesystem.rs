@@ -42,7 +42,7 @@ pub struct DirectoryEntry {
 pub fn list_directory(path: String) -> Result<Vec<DirectoryEntry>, String> {
     let directory = PathBuf::from(path.trim());
     if !directory.is_dir() {
-        return Err("directory not found".to_string());
+        return Err("directorio no encontrado".to_string());
     }
 
     let mut entries = fs::read_dir(&directory)
@@ -71,7 +71,7 @@ pub fn list_directory(path: String) -> Result<Vec<DirectoryEntry>, String> {
 pub fn read_text_file(path: String) -> Result<String, String> {
     let file = PathBuf::from(path.trim());
     if !file.is_file() {
-        return Err("file not found".to_string());
+        return Err("archivo no encontrado".to_string());
     }
     fs::read_to_string(&file).map_err(|error| error.to_string())
 }
@@ -81,7 +81,7 @@ pub fn read_text_file(path: String) -> Result<String, String> {
 pub fn write_text_file(path: String, content: String) -> Result<(), String> {
     let file = PathBuf::from(path.trim());
     if !file.is_file() {
-        return Err("file not found".to_string());
+        return Err("archivo no encontrado".to_string());
     }
     fs::write(&file, content).map_err(|error| error.to_string())
 }
@@ -90,11 +90,11 @@ pub fn write_text_file(path: String, content: String) -> Result<(), String> {
 pub fn ensure_todo_template(directory: String) -> Result<String, String> {
     let dir = PathBuf::from(directory.trim());
     if dir.as_os_str().is_empty() {
-        return Err("empty directory".to_string());
+        return Err("directorio vacío".to_string());
     }
     fs::create_dir_all(&dir).map_err(|error| error.to_string())?;
     if !dir.is_dir() {
-        return Err("directory not found".to_string());
+        return Err("directorio no encontrado".to_string());
     }
     let template_path = dir.join(TODO_TEMPLATE_FILE);
     if !template_path.exists() {
@@ -127,7 +127,7 @@ pub fn watch_file(
     let parent = target
         .parent()
         .map(Path::to_path_buf)
-        .ok_or_else(|| "invalid path".to_string())?;
+        .ok_or_else(|| "ruta inválida".to_string())?;
 
     let mut map = state.0.lock().map_err(|e| e.to_string())?;
     // Refcount: se outro pane já observa este caminho, só incrementa a contagem.

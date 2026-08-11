@@ -152,7 +152,7 @@ pub(crate) fn project_dirs_for_cwd(cwd: &str) -> Result<Vec<PathBuf>, String> {
         return Ok(Vec::new());
     }
     let Some(root) = claude_projects_dir() else {
-        return Err("USERPROFILE/HOME nao definido".to_string());
+        return Err("USERPROFILE/HOME no definido".to_string());
     };
     let encoded = encode_cwd_for_claude(cwd_trimmed);
     Ok(matching_project_dirs(&root, &encoded))
@@ -166,7 +166,7 @@ pub(crate) fn project_dirs_for_cwd(cwd: &str) -> Result<Vec<PathBuf>, String> {
 pub async fn snapshot_claude_sessions(cwd: String) -> Result<Vec<ClaudeSessionSnapshot>, String> {
     tokio::task::spawn_blocking(move || snapshot_claude_sessions_inner(cwd))
         .await
-        .map_err(|error| format!("snapshot_claude_sessions: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("snapshot_claude_sessions: fallo en la tarea bloqueante: {error}"))?
 }
 
 fn snapshot_claude_sessions_inner(cwd: String) -> Result<Vec<ClaudeSessionSnapshot>, String> {

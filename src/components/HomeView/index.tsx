@@ -18,7 +18,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { getCachedActivity } from '../../lib/activityCache'
 import { pickDirectory } from '../../lib/dialog'
 import { formatHomeDate, formatRelativeTimestamp, getGreeting } from '../../lib/greeting'
-import { useT, type TFunction } from '../../lib/i18n'
+import { useAgentLabel, useT, type TFunction } from '../../lib/i18n'
 import { formatShortcut } from '../../lib/platform'
 import { getFirstName, getProfileImageUrl, getProfileInitial } from '../../lib/profile'
 import { openInBrowser } from '../../lib/tauri'
@@ -42,13 +42,6 @@ const NOTIFICATIONS_LIMIT = 5
 const REPOSITORY_URL = 'https://github.com/Kc1t/agent-canva'
 const ISSUES_URL = `${REPOSITORY_URL}/issues`
 const RELEASES_URL = `${REPOSITORY_URL}/releases`
-const QUICK_AGENTS: Array<{ type: AgentType; label: string }> = [
-  { type: 'claude', label: 'Claude' },
-  { type: 'codex', label: 'Codex' },
-  { type: 'antigravity', label: 'Antigravity' },
-  { type: 'opencode', label: 'OpenCode' },
-]
-
 function compactWorkspacePath(path: string): string {
   const homeCollapsed = path.replace(/^[A-Za-z]:[\\/]Users[\\/][^\\/]+/i, '~')
   const parts = homeCollapsed.split(/[\\/]/).filter(Boolean)
@@ -69,6 +62,7 @@ const NOTIF_AGENT_CLASS: Record<AgentType, string> = {
 
 export function HomeView() {
   const t = useT()
+  const agentLabel = useAgentLabel()
   const language = useProjectsStore((s) => s.preferences.language)
   const preferences = useProjectsStore((s) => s.preferences)
   const projects = useProjectsStore((s) => s.projects)
@@ -83,6 +77,16 @@ export function HomeView() {
   const requestPaneFocus = useUiStore((s) => s.requestPaneFocus)
   const notifications = useUiStore((s) => s.notifications)
   const clearNotifications = useUiStore((s) => s.clearNotifications)
+
+  const quickAgents = useMemo<Array<{ type: AgentType; label: string }>>(
+    () => [
+      { type: 'claude', label: agentLabel('claude') },
+      { type: 'codex', label: agentLabel('codex') },
+      { type: 'antigravity', label: agentLabel('antigravity') },
+      { type: 'opencode', label: agentLabel('opencode') },
+    ],
+    [agentLabel],
+  )
 
   // último uso de cada projeto: container aberto ou maior lastUsedAt dos terminais
   const lastUsedByProject = useMemo(() => {
@@ -149,7 +153,6 @@ export function HomeView() {
   const firstNameLower = firstName.toLowerCase()
   const avatarUrl = getProfileImageUrl(preferences)
   const initial = getProfileInitial(displayName)
-  const quickAgents = QUICK_AGENTS.filter((agent) => preferences.enabledAgents[agent.type])
   const fallbackQuickTarget = recentProjects[0] ?? projects[0] ?? null
   const [quickProjectId, setQuickProjectId] = useState(() => fallbackQuickTarget?.id ?? '')
   const quickTarget =
@@ -166,7 +169,7 @@ export function HomeView() {
     ? quickAgentRaw
     : (quickAgents[0]?.type ?? 'claude')
   const quickAgentLabel =
-    QUICK_AGENTS.find((agent) => agent.type === quickAgent)?.label ?? quickAgent
+    quickAgents.find((agent) => agent.type === quickAgent)?.label ?? quickAgent
 
   useEffect(() => {
     if (quickTarget && quickTarget.id !== quickProjectId) setQuickProjectId(quickTarget.id)
@@ -187,7 +190,7 @@ export function HomeView() {
     if (!quickTarget || !prompt) return
     const cwd = quickCwd.trim() || getProjectDefaultCwd(quickTarget, projects)
     const flag = quickUnrestricted ? UNRESTRICTED_FLAG[quickAgent] : null
-    const label = QUICK_AGENTS.find((agent) => agent.type === quickAgent)?.label ?? quickAgent
+    const label = quickAgents.find((agent) => agent.type === quickAgent)?.label ?? quickAgent
     const terminal = await createAgentTerminal(quickTarget.id, {
       name: label,
       cwd,

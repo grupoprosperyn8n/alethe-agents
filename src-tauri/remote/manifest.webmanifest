@@ -1,7 +1,7 @@
 {
   "name": "Alethe Remote",
   "short_name": "Alethe",
-  "description": "Alethe LAN remote workspace",
+  "description": "Espacio de trabajo remoto por LAN de Alethe",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0e1014",

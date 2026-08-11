@@ -53,7 +53,7 @@ pub fn run_validation(cwd: String, commands: Vec<String>) -> Result<ValidationRe
                 return Ok(ValidationResult {
                     success: false,
                     stage: trimmed.to_string(),
-                    output: format!("Falha ao iniciar comando: {}", e),
+                    output: format!("Fallo al iniciar el comando: {}", e),
                 });
             }
         }
@@ -62,7 +62,7 @@ pub fn run_validation(cwd: String, commands: Vec<String>) -> Result<ValidationRe
     Ok(ValidationResult {
         success: true,
         stage: "All".to_string(),
-        output: "Todas as validações passaram com sucesso!".to_string(),
+        output: "Todas las validaciones pasaron correctamente".to_string(),
     })
 }
 

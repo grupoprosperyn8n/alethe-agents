@@ -329,7 +329,7 @@ export function AgentSandbox() {
           value={from}
           onChange={setFrom}
           disabled={!active}
-          ariaLabel="Message source agent"
+          ariaLabel={t('sandbox.messageSourceAgent')}
           options={nodes.map((node) => ({ value: node.id, label: node.label }))}
         />
         <span className={styles.arrow}>→</span>
@@ -337,7 +337,7 @@ export function AgentSandbox() {
           value={to}
           onChange={setTo}
           disabled={!active}
-          ariaLabel="Message target agent"
+          ariaLabel={t('sandbox.messageTargetAgent')}
           options={nodes.map((node) => ({ value: node.id, label: node.label }))}
         />
           <input

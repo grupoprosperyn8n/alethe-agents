@@ -262,7 +262,7 @@ export function createTerminalsSlice({ get, update, updateTerminal }: SliceCtx):
     createGraphifyPane: (projectId, cwd) => {
       const pane: Terminal = {
         id: `graphify-${nanoid()}`,
-        name: 'Visualização de Grafo (Graphify)',
+        name: 'Visualización de Grafo (Graphify)',
         cwd,
         tabs: [],
         activeTabId: '',

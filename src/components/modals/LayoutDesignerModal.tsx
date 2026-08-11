@@ -460,13 +460,13 @@ function DesignerInner({ context, onClose }: { context: Context; onClose: () => 
 
           <div className={styles.toolbar}>
             <Stepper
-              label="cols"
+              label={t('mod.cols')}
               value={cols}
               onDec={() => setCols((v) => Math.max(1, v - 1))}
               onInc={() => setCols((v) => Math.min(8, v + 1))}
             />
             <Stepper
-              label="rows"
+              label={t('mod.rows')}
               value={rows}
               onDec={() => setRows((v) => Math.max(1, v - 1))}
               onInc={() => setRows((v) => Math.min(8, v + 1))}

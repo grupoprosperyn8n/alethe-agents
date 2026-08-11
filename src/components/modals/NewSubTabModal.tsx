@@ -6,23 +6,14 @@ import { useProjectsStore } from '../../stores/projectsStore'
 import { pickDirectory } from '../../lib/dialog'
 import { UNRESTRICTED_FLAG, type AgentRuntimeProfile, type AgentType } from '../../lib/types'
 import { AgentIcon } from '../icons/AgentIcons'
-import { useT } from '../../lib/i18n'
+import { useAgentLabel, useT } from '../../lib/i18n'
 import { Modal } from './Modal'
 import controls from './controls.module.css'
 import picker from './agentPicker.module.css'
 
-const AGENTS: { type: AgentType; label: string }[] = [
-  { type: 'shell', label: 'Shell' },
-  { type: 'claude', label: 'Claude' },
-  { type: 'codex', label: 'Codex' },
-  { type: 'antigravity', label: 'Antigravity' },
-  { type: 'opencode', label: 'OpenCode' },
-  { type: 'hermes', label: 'Hermes' },
-  { type: 'pi', label: 'Pi' },
-]
-
 export function NewSubTabModal() {
   const t = useT()
+  const agentLabel = useAgentLabel()
   const open = useUiStore((s) => s.openModal === 'newSubTab')
   const context = useUiStore((s) => s.modalContext) as {
     projectId?: string
@@ -53,7 +44,19 @@ export function NewSubTabModal() {
     pi: false,
   })
 
-  const visibleAgents = AGENTS.filter((a) => enabled[a.type])
+  const agents = useMemo<{ type: AgentType; label: string }[]>(
+    () => [
+      { type: 'shell', label: agentLabel('shell') },
+      { type: 'claude', label: agentLabel('claude') },
+      { type: 'codex', label: agentLabel('codex') },
+      { type: 'antigravity', label: agentLabel('antigravity') },
+      { type: 'opencode', label: agentLabel('opencode') },
+      { type: 'hermes', label: agentLabel('hermes') },
+      { type: 'pi', label: agentLabel('pi') },
+    ],
+    [agentLabel],
+  )
+  const visibleAgents = agents.filter((a) => enabled[a.type])
   const inheritedCwd = useMemo(() => {
     const activeTab =
       terminal?.tabs.find((item) => item.id === terminal.activeTabId) ?? terminal?.tabs[0]

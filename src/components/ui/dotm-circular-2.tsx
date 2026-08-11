@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 
+import { getLocale, translate } from '../../lib/i18n'
 import styles from './DotmCircular2.module.css'
 
 export type DotMatrixColorPreset =
@@ -64,7 +65,7 @@ export function DotmCircular2({
   color = 'var(--status-working)',
   colorPreset = 'solid-theme',
   speed = 1.8,
-  ariaLabel = 'Loading',
+  ariaLabel = translate(getLocale(), 'activity.loading'),
   className,
   muted = false,
   bloom = false,

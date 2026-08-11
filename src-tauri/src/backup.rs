@@ -20,7 +20,7 @@ pub async fn export_backup(app: AppHandle, target_path: String) -> Result<(), St
     let dir = app_data_dir(&app)?;
     tokio::task::spawn_blocking(move || export_backup_from_dir(dir, target_path))
         .await
-        .map_err(|error| format!("export_backup: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("export_backup: fallo en la tarea bloqueante: {error}"))?
 }
 
 /// Igual a `export_backup`, mas pra um perfil específico (não necessariamente o ativo).
@@ -33,7 +33,7 @@ pub async fn export_profile_backup(
     let dir = profile_data_dir_for_id(&app, &profile_id)?;
     tokio::task::spawn_blocking(move || export_backup_from_dir(dir, target_path))
         .await
-        .map_err(|error| format!("export_profile_backup: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("export_profile_backup: fallo en la tarea bloqueante: {error}"))?
 }
 
 fn export_backup_from_dir(dir: PathBuf, target_path: String) -> Result<(), String> {
@@ -105,7 +105,7 @@ fn add_dir_to_zip<W: Write + io::Seek>(
 pub async fn import_backup(app: AppHandle, source_path: String) -> Result<(), String> {
     tokio::task::spawn_blocking(move || import_backup_inner(app, source_path))
         .await
-        .map_err(|error| format!("import_backup: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("import_backup: fallo en la tarea bloqueante: {error}"))?
 }
 
 fn import_backup_inner(app: AppHandle, source_path: String) -> Result<(), String> {

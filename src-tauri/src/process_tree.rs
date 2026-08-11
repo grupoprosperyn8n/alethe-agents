@@ -268,10 +268,10 @@ fn kill_pid(pid: u32) {
 /// Ordem: folhas primeiro → raiz por último para evitar reparentamento.
 pub fn kill_pty_tree(pty_id: &str) -> Result<Vec<u32>, String> {
     let root_pid = {
-        let guard = roots().lock().map_err(|_| "PTY roots lock poisoned")?;
+        let guard = roots().lock().map_err(|_| "el candado de las raíces PTY está envenenado")?;
         guard.get(pty_id).copied()
     };
-    let root = root_pid.ok_or_else(|| format!("No root PID registered for PTY: {pty_id}"))?;
+    let root = root_pid.ok_or_else(|| format!("No hay un PID raíz registrado para el PTY: {pty_id}"))?;
 
     let parent_map = get_parent_map();
     let mut all = collect_descendants(root, &parent_map);
@@ -302,5 +302,5 @@ pub async fn kill_pty_tree_cmd(pty_id: String) -> Result<Vec<u32>, String> {
     // IPC atrás dele (mesma classe de bug já corrigida em spawn_pty/attach_pty).
     tokio::task::spawn_blocking(move || kill_pty_tree(&pty_id))
         .await
-        .map_err(|error| format!("kill_pty_tree_cmd: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("kill_pty_tree_cmd: fallo en la tarea bloqueante: {error}"))?
 }

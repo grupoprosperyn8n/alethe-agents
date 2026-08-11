@@ -85,7 +85,7 @@ export const MarkdownPane = memo(function MarkdownPane({
 
   const reload = useCallback(async () => {
     if (!filePath) {
-      setError('no file')
+      setError(t('ui.markdown.noFile'))
       return
     }
     try {

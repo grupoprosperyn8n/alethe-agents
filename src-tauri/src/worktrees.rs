@@ -111,7 +111,7 @@ pub async fn worktree_provision(
 ) -> Result<WorktreeInfo, String> {
     tokio::task::spawn_blocking(move || worktree_provision_inner(repo, agent_id, mode))
         .await
-        .map_err(|error| format!("worktree_provision: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("worktree_provision: fallo en la tarea bloqueante: {error}"))?
 }
 
 pub(crate) fn worktree_provision_inner(
@@ -162,7 +162,7 @@ pub(crate) fn worktree_provision_inner(
 pub async fn worktree_list(repo: String) -> Result<Vec<WorktreeInfo>, String> {
     tokio::task::spawn_blocking(move || worktree_list_inner(repo))
         .await
-        .map_err(|error| format!("worktree_list: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("worktree_list: fallo en la tarea bloqueante: {error}"))?
 }
 
 pub(crate) fn worktree_list_inner(repo: String) -> Result<Vec<WorktreeInfo>, String> {
@@ -200,7 +200,7 @@ pub(crate) fn worktree_list_inner(repo: String) -> Result<Vec<WorktreeInfo>, Str
 pub async fn worktree_remove(repo: String, agent_id: String, force: bool) -> Result<(), String> {
     tokio::task::spawn_blocking(move || worktree_remove_inner(repo, agent_id, force))
         .await
-        .map_err(|error| format!("worktree_remove: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("worktree_remove: fallo en la tarea bloqueante: {error}"))?
 }
 
 pub(crate) fn worktree_remove_inner(repo: String, agent_id: String, force: bool) -> Result<(), String> {
@@ -258,7 +258,7 @@ pub(crate) fn worktree_remove_inner(repo: String, agent_id: String, force: bool)
 pub async fn worktree_lock(repo: String, agent_id: String, reason: Option<String>) -> Result<(), String> {
     tokio::task::spawn_blocking(move || worktree_lock_inner(repo, agent_id, reason))
         .await
-        .map_err(|error| format!("worktree_lock: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("worktree_lock: fallo en la tarea bloqueante: {error}"))?
 }
 
 pub(crate) fn worktree_lock_inner(repo: String, agent_id: String, reason: Option<String>) -> Result<(), String> {
@@ -280,7 +280,7 @@ pub(crate) fn worktree_lock_inner(repo: String, agent_id: String, reason: Option
 pub async fn worktree_unlock(repo: String, agent_id: String) -> Result<(), String> {
     tokio::task::spawn_blocking(move || worktree_unlock_inner(repo, agent_id))
         .await
-        .map_err(|error| format!("worktree_unlock: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("worktree_unlock: fallo en la tarea bloqueante: {error}"))?
 }
 
 pub(crate) fn worktree_unlock_inner(repo: String, agent_id: String) -> Result<(), String> {
@@ -305,7 +305,7 @@ pub(crate) fn worktree_unlock_inner(repo: String, agent_id: String) -> Result<()
 pub async fn worktree_fetch_branch(repo: String, agent_id: String) -> Result<(), String> {
     tokio::task::spawn_blocking(move || worktree_fetch_branch_inner(repo, agent_id))
         .await
-        .map_err(|error| format!("worktree_fetch_branch: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("worktree_fetch_branch: fallo en la tarea bloqueante: {error}"))?
 }
 
 pub(crate) fn worktree_fetch_branch_inner(repo: String, agent_id: String) -> Result<(), String> {
@@ -330,7 +330,7 @@ pub(crate) fn worktree_fetch_branch_inner(repo: String, agent_id: String) -> Res
 pub async fn worktree_cleanup(repo: String) -> Result<(), String> {
     tokio::task::spawn_blocking(move || worktree_cleanup_inner(repo))
         .await
-        .map_err(|error| format!("worktree_cleanup: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("worktree_cleanup: fallo en la tarea bloqueante: {error}"))?
 }
 
 pub(crate) fn worktree_cleanup_inner(repo: String) -> Result<(), String> {
@@ -569,10 +569,10 @@ mod tests {
             cmd.stdout(Stdio::piped());
             cmd.stderr(Stdio::piped());
 
-            let output = cmd.output().map_err(|e| format!("falha ao rodar opencode: {e}"))?;
+            let output = cmd.output().map_err(|e| format!("fallo al ejecutar opencode: {e}"))?;
             if !output.status.success() {
                 return Err(format!(
-                    "opencode run saiu com codigo {:?}\nstderr: {}\nstdout (ultimos 2000 chars): {}",
+                    "opencode run salió con código {:?}\nstderr: {}\nstdout (últimos 2000 chars): {}",
                     output.status.code(),
                     String::from_utf8_lossy(&output.stderr),
                     String::from_utf8_lossy(&output.stdout)

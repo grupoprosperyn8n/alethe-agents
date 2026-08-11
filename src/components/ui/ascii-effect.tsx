@@ -1,5 +1,6 @@
 import { useEffect, useRef, type HTMLAttributes, type PointerEvent } from 'react'
 
+import { useT } from '../../lib/i18n'
 import styles from './AsciiEffect.module.css'
 
 export interface AsciiEffectProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
@@ -71,7 +72,7 @@ function gradientColor(colors: string[], amount: number): string {
 
 export function AsciiEffect({
   imageSrc,
-  alt = 'ASCII rendering',
+  alt,
   variant = 'image',
   chars = ' .:-=+*#%@',
   fontSize = 9,
@@ -106,6 +107,8 @@ export function AsciiEffect({
   onPointerLeave,
   ...props
 }: AsciiEffectProps) {
+  const t = useT()
+  const altText = alt ?? t('image.asciiRenderingAlt')
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const pointer = useRef({ x: 0, y: 0, targetX: 0, targetY: 0, active: false })
@@ -374,7 +377,7 @@ export function AsciiEffect({
       onPointerLeave={resetPointer}
       {...props}
     >
-      <canvas ref={canvasRef} role="img" aria-label={alt} className={styles.canvas} />
+      <canvas ref={canvasRef} role="img" aria-label={altText} className={styles.canvas} />
     </div>
   )
 }

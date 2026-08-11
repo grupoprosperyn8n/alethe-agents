@@ -19,7 +19,7 @@ import { createPortal } from 'react-dom'
 import { type GsdSyncSession, useGsdSyncSessions } from '../../hooks/useGsdSyncSessions'
 import { useT } from '../../lib/i18n'
 import { type PlanningStatus, readPlanningStatus } from '../../lib/tauri'
-import { TODO_TITLE_MAX_LENGTH } from '../../lib/todos'
+import { TODO_TITLE_MAX_LENGTH, translateDefaultTodoTitle } from '../../lib/todos'
 import type { Terminal, TodoItem } from '../../lib/types'
 import { selectActiveProject, useProjectsStore } from '../../stores/projectsStore'
 import { useUiStore } from '../../stores/uiStore'
@@ -149,7 +149,7 @@ export function TodoSidebar() {
 
   const startEditing = (todo: TodoItem) => {
     setEditingId(todo.id)
-    setEditTitle(todo.title)
+    setEditTitle(translateDefaultTodoTitle(todo.title, t))
   }
 
   const finishEditing = () => {
@@ -260,9 +260,11 @@ export function TodoSidebar() {
                       type="button"
                       className={styles.titleButton}
                       onClick={() => startEditing(todo)}
-                      title={todo.title}
+                      title={translateDefaultTodoTitle(todo.title, t)}
                     >
-                      <span className={styles.todoTitleText}>{todo.title}</span>
+                      <span className={styles.todoTitleText}>
+                        {translateDefaultTodoTitle(todo.title, t)}
+                      </span>
                     </button>
                     {todo.tags.length > 0 ? (
                       <span className={styles.tags}>

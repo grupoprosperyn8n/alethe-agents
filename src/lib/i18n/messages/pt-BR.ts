@@ -1,4 +1,4 @@
-import type { MessageKey } from './en'
+import type { MessageKey } from './es'
 
 /**
  * Tradução pt-BR. Tipada como `Record<MessageKey, string>` — se faltar ou
@@ -6,6 +6,28 @@ import type { MessageKey } from './en'
  */
 export const ptBR: Record<MessageKey, string> = {
   /* ---- loading ---- */
+  'clone.cloningBody': 'Iniciando o clone de {url} e gerando o briefing de contexto de IA...',
+  'clone.cloningTitle': 'Clonando repositório',
+  'clone.errorTitle': 'Erro no clone',
+  'clone.successBody': 'Clone concluído com sucesso. Contexto de IA injetado em AGENTS.md e CLAUDE.md.',
+  'clone.successTitle': 'Repositório clonado',
+  'common.closeNotification': 'Fechar notificação',
+  'crud.editProjectConfirmRemoveAgentEnv': 'Remover ambiente do agente "{agentId}"?',
+  'crud.editProjectRemoveAgentEnvFailed': 'Não foi possível remover: {error}',
+  'diff.binaryFile': 'Arquivo binário',
+  'discord.managingTerminals': 'Gerenciando terminais',
+  'discord.orchestratingAgents': 'Orquestrando agentes de IA',
+  'discord.testingOrchestration': 'Testando orquestração de agentes',
+  'discord.viewingDashboard': 'Vendo o painel',
+  'discord.workingWithAlethe': 'Trabalhando com Alethe',
+  'fileExplorer.loadFailed': 'Não foi possível ler esta pasta.',
+  'fileExplorer.loading': 'Carregando...',
+  'fileExplorer.noActiveFolder': 'Este terminal não possui uma pasta ativa.',
+  'fileExplorer.refreshFiles': 'Atualizar arquivos',
+  'image.asciiRenderingAlt': 'Renderização ASCII',
+  'image.defaultPhotoTitle': 'Foto padrão',
+  'image.iconPreviewAlt': 'Pré-visualização do ícone',
+  'image.previewTitle': 'Pré-visualização de foto/ícone',
   'loading.initializing': 'Inicializando workspace',
 
   /* ---- common ---- */
@@ -26,6 +48,8 @@ export const ptBR: Record<MessageKey, string> = {
   'language.subtitle': 'Escolha o idioma da interface. Você pode mudar depois nas Preferências.',
 
   /* ---- onboarding ---- */
+  'mod.cols': 'colunas',
+  'mod.rows': 'linhas',
   'onboarding.title': 'Criar perfil',
   'onboarding.kicker': 'Configuração rápida',
   'onboarding.subtitle': 'Quatro passos curtos. Direto, local e fácil de revisar depois.',
@@ -83,6 +107,13 @@ export const ptBR: Record<MessageKey, string> = {
   'agent.hermes.desc': 'Ponte de mensageria multiplataforma',
   'agent.pi.desc': 'CLI de utilidades para busca e análise',
   'agent.antigravity.desc': 'Google Antigravity CLI',
+  'agent.claude.label': 'Claude Code',
+  'agent.codex.label': 'Codex',
+  'agent.opencode.label': 'OpenCode',
+  'agent.antigravity.label': 'Antigravity',
+  'agent.hermes.label': 'Hermes',
+  'agent.pi.label': 'Pi CLI',
+  'agent.shell.label': 'Shell',
 
   /* ---- image input ---- */
   'image.placeholder': 'https://exemplo.com/icone.png',
@@ -93,6 +124,31 @@ export const ptBR: Record<MessageKey, string> = {
   'image.tooLarge': 'Imagem muito grande. Use uma imagem de até 2 MB.',
 
   /* ---- welcome ---- */
+  'prefs.appIconThemeAria': 'Tema do ícone do app',
+  'prefs.appIconThemeDesc': 'Escolha o ícone da área de trabalho independentemente do tema da interface.',
+  'prefs.appIconThemeTitle': 'Tema do ícone do app',
+  'prefs.installPluginButton': 'Instalar novo plugin (JSON)',
+  'prefs.multiagentTraceTask': 'Tarefa: {taskId}',
+  'prefs.pluginAutocommitError': 'Não foi possível alterar o autocommit: {error}',
+  'prefs.pluginConfirmUninstall': 'Desinstalar plugin "{id}"?',
+  'prefs.pluginEmpty': 'Nenhum plugin instalado no momento.',
+  'prefs.pluginInstallError': 'Não foi possível instalar o plugin: {error}',
+  'prefs.pluginInstallSuccess': 'Plugin instalado com sucesso.',
+  'prefs.pluginInvalidManifest': 'Manifesto inválido. Preencha nome, versão e tipo.',
+  'prefs.pluginLoading': 'Carregando plugins...',
+  'prefs.pluginManagerDesc': 'Veja e instale plugins de orquestrador e ferramentas personalizadas.',
+  'prefs.pluginManagerTitle': 'Gerenciador de plugins',
+  'prefs.pluginPasteManifest': 'Cole o JSON do manifesto do plugin:',
+  'prefs.pluginUninstallError': 'Não foi possível desinstalar o plugin: {error}',
+  'prefs.pluginUninstallSuccess': 'Plugin desinstalado.',
+  'sandbox.messageSourceAgent': 'Agente origem da mensagem',
+  'sandbox.messageTargetAgent': 'Agente destino da mensagem',
+  'todo.defaultOpenReadme': 'Abrir README do projeto',
+  'todo.defaultPlanNextStep': 'Planejar próximo passo de implementação',
+  'todo.defaultReviewWorkspace': 'Revisar workspace ativo',
+  'ui.markdown.noFile': 'sem arquivo',
+  'ui.sidebar.addTerminalFirst': 'Adicione um terminal ao projeto primeiro para obter a raiz do repositório.',
+  'update.noPendingUpdate': 'Não há nenhuma atualização pendente para instalar.',
   'welcome.dayCount': 'Dia {days} no {product}',
   'welcome.greeting': 'Olá, {name}',
   'welcome.subtitle': 'Bem-vindo de volta. Vamos orquestrar seus terminais de hoje?',
@@ -411,6 +467,7 @@ export const ptBR: Record<MessageKey, string> = {
   'prefs.multiagentSchedulerTitle': 'Agendador e fila de tarefas',
   'prefs.multiagentSchedulerDesc': 'Gerencia ondas de execução a partir do backlog real de `.planning/task.md` por projeto.',
   'prefs.multiagentSelectProjectOption': '-- Selecione um projeto --',
+  'prefs.multiagentSelectProjectAria': 'Selecione um projeto',
   'prefs.multiagentRunTick': 'Rodar tick (forçar fila)',
   'prefs.multiagentLoadingQueue': 'Carregando fila do projeto...',
   'prefs.multiagentNoTasks': 'Nenhuma tarefa encontrada em `.planning/task.md`.',
@@ -468,6 +525,8 @@ export const ptBR: Record<MessageKey, string> = {
     '{dir} não está no seu PATH. Adicione no perfil do shell: export PATH="{dir}:$PATH"',
   'prefs.cliUnsupported': 'O comando de terminal não está disponível nesta plataforma.',
   'prefs.spotify': 'Spotify',
+  'prefs.spotifyClientId': 'ID do cliente',
+  'prefs.spotifyClientSecret': 'Segredo do cliente',
   'prefs.spotifyDesc': 'Configure o aplicativo do Spotify usado no widget Now Playing.',
   'prefs.discordPresence': 'Rich Presence do Discord',
   'prefs.discordPresenceEnabled': 'Ativado',
@@ -1587,6 +1646,9 @@ export const ptBR: Record<MessageKey, string> = {
     'Travada administrativamente pelo motivo: {reason}. Execute "git worktree unlock" para liberar.',
   'multiAgent.orphanManualRemoval':
     'A limpeza automática falhou repetidamente. Recomenda-se remoção manual.',
+  'multiAgent.agentWorktreeLabel': 'Agente: {agentId} ({mode})',
+  'multiAgent.modeWorktree': 'Worktree',
+  'multiAgent.modeCopy': 'Cópia',
   'merge.integrate': 'Integrar',
   'merge.integrateTooltip':
     'Faz merge do trabalho deste agente no branch principal e remove o ambiente',

@@ -88,7 +88,7 @@ fn set_window_opacity(window: tauri::WebviewWindow, opacity: f64) -> Result<(), 
 #[cfg(not(windows))]
 #[tauri::command]
 fn set_window_opacity(_window: tauri::WebviewWindow, _opacity: f64) -> Result<(), String> {
-    Err("Window opacity is currently supported on Windows only".into())
+    Err("La opacidad de la ventana solo está disponible en Windows".into())
 }
 
 #[cfg(any(debug_assertions, desktop))]

@@ -91,8 +91,8 @@ export function NewProjectModal() {
     if (trimmedGithub) {
       closeModal()
       pushToast({
-        title: 'Clonando Repositório',
-        body: `Iniciando clone de ${trimmedGithub} e gerando briefing de contexto de IA...`,
+        title: t('clone.cloningTitle'),
+        body: t('clone.cloningBody', { url: trimmedGithub }),
         agent: 'claude',
       })
       try {
@@ -100,14 +100,14 @@ export function NewProjectModal() {
         // o backend resolver o padrao. O nome da pasta sai da URL do repo.
         await cloneGithubRepo(trimmedGithub, defaultCwd.trim())
         pushToast({
-          title: 'Repositório Clonado',
-          body: 'Clone concluído com sucesso. Contexto de IA injetado em AGENTS.md e CLAUDE.md.',
+          title: t('clone.successTitle'),
+          body: t('clone.successBody'),
           agent: 'claude',
         })
       } catch (err) {
         console.error('Falha ao clonar repositório GitHub:', err)
         pushToast({
-          title: 'Erro no Clone',
+          title: t('clone.errorTitle'),
           body: String(err),
           agent: 'claude',
         })

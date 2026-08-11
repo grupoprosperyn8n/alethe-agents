@@ -215,7 +215,7 @@ fn graphify_ensure_graph_inner(repo: String, command: Option<String>) -> Result<
 pub async fn graphify_ensure_graph(repo: String, command: Option<String>) -> Result<String, String> {
     tokio::task::spawn_blocking(move || graphify_ensure_graph_inner(repo, command))
         .await
-        .map_err(|error| format!("graphify_ensure_graph: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("graphify_ensure_graph: fallo en la tarea bloqueante: {error}"))?
 }
 
 /// Detecta se o CLI do Graphify está disponível (`<cmd> --version`).
@@ -245,7 +245,7 @@ fn graphify_detect_inner(command: Option<String>) -> Result<GraphifyStatus, Stri
 pub async fn graphify_detect(command: Option<String>) -> Result<GraphifyStatus, String> {
     tokio::task::spawn_blocking(move || graphify_detect_inner(command))
         .await
-        .map_err(|error| format!("graphify_detect: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("graphify_detect: fallo en la tarea bloqueante: {error}"))?
 }
 
 /// Escreve (idempotente por projeto) o `.mcp` que registra o servidor do
@@ -271,7 +271,7 @@ fn graphify_mcp_config_path_inner(repo: String, command: Option<String>) -> Resu
 pub async fn graphify_mcp_config_path(repo: String, command: Option<String>) -> Result<String, String> {
     tokio::task::spawn_blocking(move || graphify_mcp_config_path_inner(repo, command))
         .await
-        .map_err(|error| format!("graphify_mcp_config_path: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("graphify_mcp_config_path: fallo en la tarea bloqueante: {error}"))?
 }
 
 /// Codex e OpenCode não têm um equivalente ao `--mcp-config <path>` do Claude —
@@ -339,7 +339,7 @@ pub(crate) fn graphify_opencode_config_write_inner(repo: String, command: Option
 pub async fn graphify_opencode_config_write(repo: String, command: Option<String>) -> Result<(), String> {
     tokio::task::spawn_blocking(move || graphify_opencode_config_write_inner(repo, command))
         .await
-        .map_err(|error| format!("graphify_opencode_config_write: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("graphify_opencode_config_write: fallo en la tarea bloqueante: {error}"))?
 }
 
 /// Mescla (sem sobrescrever outras chaves) a tabela `[mcp_servers.graphify]`
@@ -398,7 +398,7 @@ fn graphify_codex_config_write_inner(repo: String, command: Option<String>) -> R
 pub async fn graphify_codex_config_write(repo: String, command: Option<String>) -> Result<(), String> {
     tokio::task::spawn_blocking(move || graphify_codex_config_write_inner(repo, command))
         .await
-        .map_err(|error| format!("graphify_codex_config_write: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("graphify_codex_config_write: fallo en la tarea bloqueante: {error}"))?
 }
 
 fn value_to_id(value: &Value) -> Option<String> {
@@ -502,7 +502,7 @@ fn graphify_read_graph_inner(repo: String) -> Result<GraphData, String> {
 pub async fn graphify_read_graph(repo: String) -> Result<GraphData, String> {
     tokio::task::spawn_blocking(move || graphify_read_graph_inner(repo))
         .await
-        .map_err(|error| format!("graphify_read_graph: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("graphify_read_graph: fallo en la tarea bloqueante: {error}"))?
 }
 
 /// Copia o `graph.json` atual para `.alethe/graph-snapshots/<ts>.json`.
@@ -540,7 +540,7 @@ pub(crate) fn graphify_snapshot_inner(repo: String, project_id: Option<String>) 
 pub async fn graphify_snapshot(repo: String, project_id: Option<String>) -> Result<SnapshotInfo, String> {
     tokio::task::spawn_blocking(move || graphify_snapshot_inner(repo, project_id))
         .await
-        .map_err(|error| format!("graphify_snapshot: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("graphify_snapshot: fallo en la tarea bloqueante: {error}"))?
 }
 
 fn read_snapshots(root: &Path) -> Result<Vec<SnapshotInfo>, String> {
@@ -582,7 +582,7 @@ fn graphify_list_snapshots_inner(repo: String) -> Result<Vec<SnapshotInfo>, Stri
 pub async fn graphify_list_snapshots(repo: String) -> Result<Vec<SnapshotInfo>, String> {
     tokio::task::spawn_blocking(move || graphify_list_snapshots_inner(repo))
         .await
-        .map_err(|error| format!("graphify_list_snapshots: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("graphify_list_snapshots: fallo en la tarea bloqueante: {error}"))?
 }
 
 fn id_sets(path: &Path) -> Result<(std::collections::HashSet<String>, std::collections::HashSet<String>), String> {
@@ -657,7 +657,7 @@ pub async fn graphify_diff_snapshot(
 ) -> Result<GraphDiff, String> {
     tokio::task::spawn_blocking(move || graphify_diff_snapshot_inner(repo, base_id, compare_id))
         .await
-        .map_err(|error| format!("graphify_diff_snapshot: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("graphify_diff_snapshot: fallo en la tarea bloqueante: {error}"))?
 }
 
 /// Restaura um snapshot sobre `graphify-out/graph.json`.
@@ -689,7 +689,7 @@ pub async fn graphify_rollback(
 ) -> Result<(), String> {
     tokio::task::spawn_blocking(move || graphify_rollback_inner(repo, snapshot_id, project_id))
         .await
-        .map_err(|error| format!("graphify_rollback: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("graphify_rollback: fallo en la tarea bloqueante: {error}"))?
 }
 
 /// Memory policy: mantém os `keep_last` snapshots mais novos e remove os mais
@@ -740,7 +740,7 @@ pub async fn graphify_prune_snapshots(
         graphify_prune_snapshots_inner(repo, keep_last, max_age_days, project_id)
     })
     .await
-    .map_err(|error| format!("graphify_prune_snapshots: falha na task bloqueante: {error}"))?
+    .map_err(|error| format!("graphify_prune_snapshots: fallo en la tarea bloqueante: {error}"))?
 }
 
 #[cfg(test)]

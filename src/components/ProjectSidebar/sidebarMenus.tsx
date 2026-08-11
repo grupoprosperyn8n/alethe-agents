@@ -149,7 +149,7 @@ export function createSidebarMenus(deps: SidebarMenuDeps) {
                 actions.createGraphifyPane(project.id, repoPath)
                 setActiveView('workspace')
               } else {
-                alert('Adicione um terminal ao projeto primeiro para obter a raiz do repositório.')
+                alert(t('ui.sidebar.addTerminalFirst'))
               }
             },
           },

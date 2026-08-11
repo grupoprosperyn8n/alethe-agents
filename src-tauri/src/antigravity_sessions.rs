@@ -92,7 +92,7 @@ fn cwd_matches(norm: &str, target_cwd: &str) -> bool {
 pub async fn snapshot_antigravity_sessions(cwd: String) -> Result<Vec<AntigravitySessionSnapshot>, String> {
     tokio::task::spawn_blocking(move || snapshot_antigravity_sessions_inner(cwd))
         .await
-        .map_err(|error| format!("snapshot_antigravity_sessions: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("snapshot_antigravity_sessions: fallo en la tarea bloqueante: {error}"))?
 }
 
 fn snapshot_antigravity_sessions_inner(cwd: String) -> Result<Vec<AntigravitySessionSnapshot>, String> {

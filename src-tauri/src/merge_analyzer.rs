@@ -93,37 +93,37 @@ pub fn classify_path(path: &str) -> ConflictClass {
 pub fn class_strategy(class: ConflictClass) -> &'static str {
     match class {
         ConflictClass::Rust => {
-            "Código Rust: preserve as duas intenções; após resolver, o código deve compilar (cargo check)."
+            "Código Rust: preserve las dos intenciones; tras resolver, el código debe compilar (cargo check)."
         }
         ConflictClass::TypeScript => {
-            "Código TypeScript/JS: preserve as duas intenções; imports/exports duplicados são a causa comum; tsc deve passar."
+            "Código TypeScript/JS: preserve las dos intenciones; los imports/exports duplicados son la causa común; tsc debe pasar."
         }
         ConflictClass::Ui => {
-            "Estilos: una as regras das duas branches; nunca invente cores novas — use os tokens de tema existentes."
+            "Estilos: combine las reglas de las dos ramas; nunca invente colores nuevos — use los tokens de tema existentes."
         }
         ConflictClass::Cargo => {
-            "Cargo.toml/lock: una as dependências das duas branches; em conflito de Cargo.lock prefira regenerar (cargo update -p / cargo check) a editar na mão."
+            "Cargo.toml/lock: combine las dependencias de las dos ramas; en conflicto de Cargo.lock prefiera regenerar (cargo update -p / cargo check) en lugar de editar a mano."
         }
         ConflictClass::Package => {
-            "package.json/lockfile: una as dependências; em conflito de lockfile prefira regenerar (npm install) a editar na mão."
+            "package.json/lockfile: combine las dependencias; en conflicto de lockfile prefiera regenerar (npm install) en lugar de editar a mano."
         }
         ConflictClass::Json => {
-            "JSON: resultado precisa ser JSON válido; una as chaves das duas branches; atenção a vírgulas."
+            "JSON: el resultado debe ser JSON válido; combine las claves de las dos ramas; preste atención a las comas."
         }
         ConflictClass::Config => {
-            "Configuração: una as entradas; em chaves duplicadas com valores diferentes, entenda a intenção de cada branch antes de escolher."
+            "Configuración: combine las entradas; en claves duplicadas con valores distintos, entienda la intención de cada rama antes de elegir."
         }
         ConflictClass::Asset => {
-            "Binário/asset: não há merge textual — escolha a versão correta (geralmente a mais nova) via git checkout --theirs/--ours."
+            "Binario/asset: no hay merge textual — elija la versión correcta (generalmente la más nueva) mediante git checkout --theirs/--ours."
         }
         ConflictClass::Planning => {
-            "Planejamento (.planning/): preserve o histórico das duas branches; nunca descarte tarefas de nenhum lado."
+            "Planificación (.planning/): preserve el historial de las dos ramas; nunca descarte tareas de ningún lado."
         }
         ConflictClass::Graph => {
-            "Grafo (graphify-out/): não resolva na mão — o grafo é gerado; escolha qualquer lado e regenere com o Graphify depois."
+            "Grafo (graphify-out/): no lo resuelva a mano — el grafo se genera; elija cualquier lado y regenérelo con Graphify después."
         }
         ConflictClass::Other => {
-            "Preserve as duas intenções; se não tiver certeza, mantenha os dois trechos e sinalize no commit."
+            "Preserve las dos intenciones; si no está seguro, mantenga los dos fragmentos y señálelo en el commit."
         }
     }
 }

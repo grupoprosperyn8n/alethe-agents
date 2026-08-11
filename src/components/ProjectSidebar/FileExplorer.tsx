@@ -2,6 +2,7 @@ import { ChevronDown, ChevronRight, File, Folder, FolderOpen, RefreshCw } from '
 import { useEffect, useState } from 'react'
 
 import { basename } from '../../lib/paths'
+import { useT } from '../../lib/i18n'
 import { getPtyCwd, listDirectory, type DirectoryEntry } from '../../lib/tauri'
 import { useProjectsStore } from '../../stores/projectsStore'
 import { useUiStore } from '../../stores/uiStore'
@@ -15,6 +16,7 @@ type FileExplorerProps = {
 }
 
 export function FileExplorer({ projectId, cwd, ptyId, terminalName }: FileExplorerProps) {
+  const t = useT()
   const [reloadKey, setReloadKey] = useState(0)
   const [liveCwd, setLiveCwd] = useState(cwd)
 
@@ -33,7 +35,7 @@ export function FileExplorer({ projectId, cwd, ptyId, terminalName }: FileExplor
   }, [cwd, ptyId])
 
   if (!liveCwd) {
-    return <div className={styles.message}>Este terminal nao possui uma pasta ativa.</div>
+    return <div className={styles.message}>{t('fileExplorer.noActiveFolder')}</div>
   }
 
   return (
@@ -45,8 +47,8 @@ export function FileExplorer({ projectId, cwd, ptyId, terminalName }: FileExplor
           type="button"
           className={styles.iconButton}
           onClick={() => setReloadKey((value) => value + 1)}
-          title="Atualizar arquivos"
-          aria-label="Atualizar arquivos"
+          title={t('fileExplorer.refreshFiles')}
+          aria-label={t('fileExplorer.refreshFiles')}
         >
           <RefreshCw size={13} />
         </button>
@@ -82,6 +84,8 @@ function DirectoryNode({
   const [entries, setEntries] = useState<DirectoryEntry[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
+
+  const t = useT()
 
   const createFilePane = useProjectsStore((s) => s.createFilePane)
   const openPane = useProjectsStore((s) => s.openPane)
@@ -128,8 +132,8 @@ function DirectoryNode({
       </button>
       {open ? (
         <div>
-          {loading ? <div className={styles.message}>Carregando...</div> : null}
-          {error ? <div className={styles.message}>Nao foi possivel ler esta pasta.</div> : null}
+          {loading ? <div className={styles.message}>{t('fileExplorer.loading')}</div> : null}
+          {error ? <div className={styles.message}>{t('fileExplorer.loadFailed')}</div> : null}
           {!loading && !error
             ? entries.map((entry) =>
                 entry.is_dir ? (

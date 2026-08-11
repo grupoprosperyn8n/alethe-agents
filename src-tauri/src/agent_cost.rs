@@ -289,7 +289,7 @@ fn get_session_cost_inner(
     let by_model: Vec<ModelCost> = match agent.as_str() {
         "codex" => {
             let Some(path) = find_codex_session_path(&session_id) else {
-                return Err(format!("sessão codex {session_id} não encontrada"));
+                return Err(format!("sesión codex {session_id} no encontrada"));
             };
             vec![parse_codex_cost(&path)]
         }
@@ -304,22 +304,22 @@ fn get_session_cost_inner(
                 }
             }
             let Some(path) = path else {
-                return Err(format!("sessão claude {session_id} não encontrada"));
+                return Err(format!("sesión claude {session_id} no encontrada"));
             };
             parse_claude_cost(&path).into_values().collect()
         }
         "opencode" => {
             let db_path = opencode_db_path()
-                .ok_or_else(|| "caminho do banco do OpenCode não encontrado".to_string())?;
+                .ok_or_else(|| "ruta de la base de datos de OpenCode no encontrada".to_string())?;
             if !db_path.is_file() {
-                return Err(format!("banco do OpenCode não encontrado em: {db_path:?}"));
+                return Err(format!("base de datos de OpenCode no encontrada en: {db_path:?}"));
             }
 
             let conn = rusqlite::Connection::open_with_flags(
                 &db_path,
                 rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY | rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX,
             )
-            .map_err(|e| format!("falha ao abrir banco do OpenCode: {e}"))?;
+            .map_err(|e| format!("fallo al abrir la base de datos de OpenCode: {e}"))?;
 
             // `session.id` é PRIMARY KEY (confirmado no schema real) — no máximo 1
             // linha por sessão, então `rows.next()` uma vez é correto (não é bug de
@@ -330,14 +330,14 @@ fn get_session_cost_inner(
                 .prepare(
                     "SELECT model, tokens_input, tokens_output, tokens_cache_read, tokens_cache_write, cost FROM session WHERE id = ?1",
                 )
-                .map_err(|e| format!("falha ao preparar query: {e}"))?;
+                .map_err(|e| format!("fallo al preparar la consulta: {e}"))?;
 
             let mut rows = stmt
                 .query(rusqlite::params![session_id])
-                .map_err(|e| format!("falha ao executar query: {e}"))?;
+                .map_err(|e| format!("fallo al ejecutar la consulta: {e}"))?;
 
             let mut result_by_model = Vec::new();
-            if let Some(row) = rows.next().map_err(|e| format!("falha ao ler linha: {e}"))? {
+            if let Some(row) = rows.next().map_err(|e| format!("fallo al leer la fila: {e}"))? {
                 let model_raw: String = row.get(0).unwrap_or_default();
                 let tokens_input: u64 = row.get(1).unwrap_or(0);
                 let tokens_output: u64 = row.get(2).unwrap_or(0);
@@ -367,7 +367,7 @@ fn get_session_cost_inner(
             }
             result_by_model
         }
-        other => return Err(format!("agente sem custo suportado: {other}")),
+        other => return Err(format!("agente sin costo soportado: {other}")),
     };
 
     Ok(aggregate(agent, session_id, by_model))
@@ -386,7 +386,7 @@ pub async fn get_transcript_cost(path: String) -> Result<SessionCost, String> {
 fn get_transcript_cost_inner(path: String) -> Result<SessionCost, String> {
     let pb = PathBuf::from(&path);
     if !pb.is_file() {
-        return Err(format!("transcript não encontrado: {path}"));
+        return Err(format!("transcript no encontrado: {path}"));
     }
     let by_model: Vec<ModelCost> = parse_claude_cost(&pb).into_values().collect();
     Ok(aggregate("claude".to_string(), path, by_model))
@@ -484,7 +484,7 @@ pub async fn get_opencode_usage_summary(hours: u32) -> Result<OpenCodeUsageSumma
 
 fn get_opencode_usage_summary_inner(hours: u32) -> Result<OpenCodeUsageSummary, String> {
     let db_path = opencode_db_path()
-        .ok_or_else(|| "caminho do banco do OpenCode não encontrado".to_string())?;
+        .ok_or_else(|| "ruta de la base de datos de OpenCode no encontrada".to_string())?;
     if !db_path.is_file() {
         // Banco ainda não existe (OpenCode nunca rodou nesta máquina) — resumo
         // vazio, não é erro: o card mostra "sem dados" em vez de falhar.
@@ -495,7 +495,7 @@ fn get_opencode_usage_summary_inner(hours: u32) -> Result<OpenCodeUsageSummary, 
         &db_path,
         rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY | rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX,
     )
-    .map_err(|e| format!("falha ao abrir banco do OpenCode: {e}"))?;
+    .map_err(|e| format!("fallo al abrir la base de datos de OpenCode: {e}"))?;
 
     let now_ms = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)

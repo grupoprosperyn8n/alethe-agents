@@ -160,7 +160,7 @@ export function ProfilesModal() {
     try {
       const created = await createProfile(trimmed)
       const createdProfile = created.profiles.find((profile) => profile.name === trimmed)
-      if (!createdProfile) throw new Error('created profile not found')
+      if (!createdProfile) throw new Error('No se encontró el perfil creado')
       await parkCurrentProfile()
       parked = true
       await setActiveProfile(createdProfile.id)

@@ -10,11 +10,11 @@ use crate::paths::{app_data_dir, spawn_log_path};
 fn existing_path_from_user_input(path: &str) -> Result<PathBuf, String> {
     let trimmed = path.trim();
     if trimmed.is_empty() {
-        return Err("path vazio".to_string());
+        return Err("path vacío".to_string());
     }
     let target = PathBuf::from(trimmed);
     if !target.exists() {
-        return Err(format!("path nao existe: {trimmed}"));
+        return Err(format!("path no existe: {trimmed}"));
     }
     Ok(target)
 }
@@ -58,7 +58,7 @@ pub fn open_in_file_explorer(path: String) -> Result<(), String> {
 pub fn open_in_vscode(path: String) -> Result<(), String> {
     let target = existing_path_from_user_input(&path)?;
     let launcher = find_vscode_launcher().ok_or_else(|| {
-        "VS Code não encontrado (procurado em PATH, LOCALAPPDATA, ProgramFiles)".to_string()
+        "VS Code no encontrado (buscado en PATH, LOCALAPPDATA, ProgramFiles)".to_string()
     })?;
     let is_cmd = launcher
         .extension()
@@ -84,7 +84,7 @@ pub fn open_in_vscode(path: String) -> Result<(), String> {
 pub fn open_in_browser(target: String) -> Result<(), String> {
     let trimmed = target.trim();
     if trimmed.is_empty() {
-        return Err("target vazio".to_string());
+        return Err("target vacío".to_string());
     }
 
     let open_target = if trimmed.starts_with("http://") || trimmed.starts_with("https://") {
@@ -127,7 +127,7 @@ pub fn write_clipboard_text(text: String) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     {
         let _ = text;
-        Err("clipboard backend indisponivel nesta plataforma".to_string())
+        Err("backend de clipboard no disponible en esta plataforma".to_string())
     }
 }
 
@@ -145,7 +145,7 @@ pub fn read_clipboard_text() -> Result<String, String> {
 
     #[cfg(target_os = "macos")]
     {
-        Err("clipboard backend indisponivel nesta plataforma".to_string())
+        Err("backend de clipboard no disponible en esta plataforma".to_string())
     }
 }
 
@@ -175,7 +175,7 @@ pub fn read_clipboard_payload() -> Result<ClipboardPayload, String> {
 
     #[cfg(target_os = "macos")]
     {
-        Err("clipboard backend indisponivel nesta plataforma".to_string())
+        Err("backend de clipboard no disponible en esta plataforma".to_string())
     }
 }
 
@@ -230,7 +230,7 @@ mod windows_clipboard {
 
         let handle = unsafe { GlobalAlloc(GMEM_MOVEABLE, size_bytes) };
         if handle.is_null() {
-            return Err("GlobalAlloc clipboard falhou".to_string());
+            return Err("GlobalAlloc del clipboard falló".to_string());
         }
 
         let locked = unsafe { GlobalLock(handle) } as *mut u16;
@@ -238,7 +238,7 @@ mod windows_clipboard {
             unsafe {
                 GlobalFree(handle);
             }
-            return Err("GlobalLock clipboard falhou".to_string());
+            return Err("GlobalLock del clipboard falló".to_string());
         }
 
         unsafe {
@@ -251,7 +251,7 @@ mod windows_clipboard {
             unsafe {
                 GlobalFree(handle);
             }
-            return Err("EmptyClipboard falhou".to_string());
+            return Err("EmptyClipboard falló".to_string());
         }
 
         let stored = unsafe { SetClipboardData(CF_UNICODETEXT_U32, handle) };
@@ -259,7 +259,7 @@ mod windows_clipboard {
             unsafe {
                 GlobalFree(handle);
             }
-            return Err("SetClipboardData falhou".to_string());
+            return Err("SetClipboardData falló".to_string());
         }
 
         Ok(())
@@ -279,12 +279,12 @@ mod windows_clipboard {
     fn read_unicode_text_locked() -> Result<String, String> {
         let handle = unsafe { GetClipboardData(CF_UNICODETEXT_U32) };
         if handle.is_null() {
-            return Err("GetClipboardData falhou".to_string());
+            return Err("GetClipboardData falló".to_string());
         }
 
         let locked = unsafe { GlobalLock(handle) } as *const u16;
         if locked.is_null() {
-            return Err("GlobalLock clipboard falhou".to_string());
+            return Err("GlobalLock del clipboard falló".to_string());
         }
 
         let mut len = 0usize;
@@ -305,7 +305,7 @@ mod windows_clipboard {
     fn read_hdrop_paths() -> Result<Vec<String>, String> {
         let handle = unsafe { GetClipboardData(CF_HDROP_U32) };
         if handle.is_null() {
-            return Err("GetClipboardData falhou".to_string());
+            return Err("GetClipboardData falló".to_string());
         }
         let hdrop = handle as HDROP;
 
@@ -331,12 +331,12 @@ mod windows_clipboard {
     fn read_format_bytes(format: u32) -> Result<Vec<u8>, String> {
         let handle = unsafe { GetClipboardData(format) };
         if handle.is_null() {
-            return Err("GetClipboardData falhou".to_string());
+            return Err("GetClipboardData falló".to_string());
         }
         let size = unsafe { GlobalSize(handle) };
         let locked = unsafe { GlobalLock(handle) } as *const u8;
         if locked.is_null() {
-            return Err("GlobalLock clipboard falhou".to_string());
+            return Err("GlobalLock del clipboard falló".to_string());
         }
         let bytes = unsafe {
             let slice = std::slice::from_raw_parts(locked, size);
@@ -372,7 +372,7 @@ mod windows_clipboard {
     fn read_dib_as_png() -> Result<String, String> {
         let dib = read_format_bytes(CF_DIB_U32)?;
         if dib.len() < 40 {
-            return Err("dados DIB invalidos".to_string());
+            return Err("datos DIB inválidos".to_string());
         }
 
         let header_size = u32::from_le_bytes(dib[0..4].try_into().unwrap()) as usize;
@@ -446,14 +446,14 @@ mod unix_clipboard {
         let (tool, package) = if wayland() { ("wl-paste", "wl-clipboard") } else { ("xclip", "xclip") };
         which::which(tool)
             .map(|_| tool)
-            .map_err(|_| format!("{tool} não encontrado no PATH (pacote `{package}`)"))
+            .map_err(|_| format!("{tool} no encontrado en el PATH (paquete `{package}`)"))
     }
 
     fn copy_tool() -> Result<&'static str, String> {
         let (tool, package) = if wayland() { ("wl-copy", "wl-clipboard") } else { ("xclip", "xclip") };
         which::which(tool)
             .map(|_| tool)
-            .map_err(|_| format!("{tool} não encontrado no PATH (pacote `{package}`)"))
+            .map_err(|_| format!("{tool} no encontrado en el PATH (paquete `{package}`)"))
     }
 
     /// Lista os mimetypes disponíveis no clipboard (equivalente a
@@ -488,7 +488,7 @@ mod unix_clipboard {
         }
         .map_err(|e| e.to_string())?;
         if !output.status.success() {
-            return Err(format!("falha ao ler clipboard ({mime})"));
+            return Err(format!("fallo al leer el clipboard ({mime})"));
         }
         Ok(output.stdout)
     }
@@ -578,13 +578,13 @@ mod unix_clipboard {
         child
             .stdin
             .take()
-            .ok_or_else(|| "stdin do clipboard indisponível".to_string())?
+            .ok_or_else(|| "stdin del clipboard no disponible".to_string())?
             .write_all(text.as_bytes())
             .map_err(|e| e.to_string())?;
 
         let status = child.wait().map_err(|e| e.to_string())?;
         if !status.success() {
-            return Err(format!("{tool} retornou erro"));
+            return Err(format!("{tool} devolvió un error"));
         }
         Ok(())
     }
@@ -763,7 +763,7 @@ pub fn export_logs(app: AppHandle, target_path: String) -> Result<(), String> {
             }
             let name = path
                 .file_name()
-                .ok_or_else(|| "log sem nome".to_string())?
+                .ok_or_else(|| "log sin nombre".to_string())?
                 .to_string_lossy()
                 .to_string();
             zip.start_file(name, opts).map_err(|e| e.to_string())?;

@@ -5,20 +5,16 @@ import { useUiStore } from '../../stores/uiStore'
 import { basename } from '../../lib/paths'
 import { getProjectDefaultCwd, useProjectsStore } from '../../stores/projectsStore'
 import { pickDirectory } from '../../lib/dialog'
-import { AGENT_TYPE_LABELS, ALL_AGENT_TYPES, UNRESTRICTED_FLAG, type AgentRuntimeProfile, type AgentType } from '../../lib/types'
+import { ALL_AGENT_TYPES, UNRESTRICTED_FLAG, type AgentRuntimeProfile, type AgentType } from '../../lib/types'
 import { AgentIcon } from '../icons/AgentIcons'
-import { useT } from '../../lib/i18n'
+import { useAgentLabel, useT } from '../../lib/i18n'
 import { Modal } from './Modal'
 import controls from './controls.module.css'
 import styles from './NewTerminalModal.module.css'
 
-const AGENTS: { type: AgentType; label: string }[] = ALL_AGENT_TYPES.map((type) => ({
-  type,
-  label: AGENT_TYPE_LABELS[type],
-}))
-
 export function NewTerminalModal() {
   const t = useT()
+  const agentLabel = useAgentLabel()
   const open = useUiStore((s) => s.openModal === 'newTerminal')
   const context = useUiStore((s) => s.modalContext) as { projectId?: string } | null
   const closeModal = useUiStore((s) => s.closeModal)
@@ -47,12 +43,16 @@ export function NewTerminalModal() {
     pi: false,
   })
 
-  const visibleAgents = AGENTS.filter((a) => enabled[a.type])
+  const agents = useMemo<{ type: AgentType; label: string }[]>(
+    () => ALL_AGENT_TYPES.map((type) => ({ type, label: agentLabel(type) })),
+    [agentLabel],
+  )
+  const visibleAgents = agents.filter((a) => enabled[a.type])
   const defaultType =
     visibleAgents.find((agent) => agent.type === 'claude')?.type ??
     visibleAgents[0]?.type ??
     'shell'
-  const selectedAgent = AGENTS.find((agent) => agent.type === type) ?? AGENTS[0]
+  const selectedAgent = agents.find((agent) => agent.type === type) ?? agents[0]
   const inheritedCwd = useMemo(() => getProjectDefaultCwd(project, projects), [project, projects])
   const recentFolders = useMemo(() => {
     const folders = new Map<string, { path: string; lastUsedAt: number }>()

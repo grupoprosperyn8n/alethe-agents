@@ -1375,7 +1375,7 @@ export function useXtermSession(params: {
         if (!disposed) setBootPhase('ready')
       } catch (err) {
         console.error(`[pty-launch] ${command ?? 'shell'} FALHOU ao iniciar PTY:`, err)
-        if (!disposed) terminal.writeln(`Failed to start PTY: ${String(err)}`)
+        if (!disposed) terminal.writeln(`No se pudo iniciar el PTY: ${String(err)}`)
         if (!disposed) setBootPhase('ready')
       }
     }

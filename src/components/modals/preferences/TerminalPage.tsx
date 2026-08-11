@@ -1,7 +1,7 @@
 import { Minus, Plus, RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 
-import { useT } from '../../../lib/i18n'
+import { useAgentLabel, useT } from '../../../lib/i18n'
 import { isMacOS } from '../../../lib/platform'
 import { countLiveResumablePanes, resetLastSession } from '../../../lib/resetLastSession'
 import type { AgentType } from '../../../lib/types'
@@ -11,18 +11,9 @@ import { AgentIcon } from '../../icons/AgentIcons'
 import styles from '../PreferencesModal.module.css'
 import { SettingsSection } from './primitives'
 
-const AGENTS: { id: AgentType; label: string }[] = [
-  { id: 'shell', label: 'Shell' },
-  { id: 'claude', label: 'Claude Code' },
-  { id: 'codex', label: 'Codex' },
-  { id: 'antigravity', label: 'Antigravity' },
-  { id: 'opencode', label: 'OpenCode' },
-  { id: 'hermes', label: 'Hermes' },
-  { id: 'pi', label: 'Pi CLI' },
-]
-
 export function TerminalPage({ enabledCount }: { enabledCount: number }) {
   const t = useT()
+  const agentLabel = useAgentLabel()
   const preferences = useProjectsStore((state) => state.preferences)
   const setAgentEnabled = useProjectsStore((state) => state.setAgentEnabled)
   const setPreferences = useProjectsStore((state) => state.setPreferences)
@@ -231,7 +222,15 @@ export function TerminalPage({ enabledCount }: { enabledCount: number }) {
         description={t('prefs.agentsDesc')}
       >
         <div className={styles.agentList}>
-          {AGENTS.map((agent) => {
+          {[
+            { id: 'shell' as AgentType, label: agentLabel('shell') },
+            { id: 'claude' as AgentType, label: agentLabel('claude') },
+            { id: 'codex' as AgentType, label: agentLabel('codex') },
+            { id: 'antigravity' as AgentType, label: agentLabel('antigravity') },
+            { id: 'opencode' as AgentType, label: agentLabel('opencode') },
+            { id: 'hermes' as AgentType, label: agentLabel('hermes') },
+            { id: 'pi' as AgentType, label: agentLabel('pi') },
+          ].map((agent) => {
             const checked = preferences.enabledAgents[agent.id]
             const disabled = checked && enabledCount === 1
             return (

@@ -148,7 +148,7 @@ pub fn start_supervisor_event_loop() {
                     &format!("super-{}", nanoid!()),
                     Some(project_id),
                     Some(task_id),
-                    json!({ "error": "Agent inactive and failed to recover" }),
+                    json!({ "error": "el agente está inactivo y no se pudo recuperar" }),
                 );
             }
         }

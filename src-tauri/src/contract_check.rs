@@ -268,7 +268,7 @@ pub fn contract_check(env_path: String) -> Result<Vec<ContractWarning>, String> 
         .filter(|call| !routes.iter().any(|route| paths_related(&call.path_pattern, &route.path_pattern)))
         .map(|call| ContractWarning {
             reason: format!(
-                "Nenhuma rota de backend encontrada para \"{}\" (verifique se o endpoint existe)",
+                "No se encontró ninguna ruta de backend para \"{}\" (verifica si el endpoint existe)",
                 call.path_pattern
             ),
             call,

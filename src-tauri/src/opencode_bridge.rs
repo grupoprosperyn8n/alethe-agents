@@ -18,14 +18,13 @@ use std::path::PathBuf;
 
 const PLUGIN_FILE_NAME: &str = "alethe-bridge.js";
 
-const PLUGIN_SOURCE: &str = r#"// Gerado automaticamente pelo Alethe - nao editar a mao (sobrescrito no proximo
-// boot do app se o conteudo mudar).
+const PLUGIN_SOURCE: &str = r#"// Generado automáticamente por Alethe - no editar a mano (se sobrescribe en el
+// próximo arranque del app si el contenido cambia).
 //
-// Reporta o estado real (working/idle) de sessoes OpenCode de volta pro Alethe,
-// via o endpoint local passado em ALETHE_BRIDGE_ENDPOINT (injetado como env var
-// no spawn de cada terminal opencode). Best-effort: nunca deve travar nem
-// quebrar a sessao do OpenCode se o Alethe nao estiver rodando ou a porta tiver
-// mudado.
+// Reporta el estado real (working/idle) de sesiones OpenCode de vuelta a Alethe,
+// mediante el endpoint local pasado en ALETHE_BRIDGE_ENDPOINT (inyectado como env var
+// en el spawn de cada terminal opencode). Best-effort: nunca debe trabar ni
+// romper la sesión de OpenCode si Alethe no está corriendo o el puerto cambió.
 export const AletheBridgePlugin = async ({ directory }) => {
   const endpoint = process.env.ALETHE_BRIDGE_ENDPOINT
   if (!endpoint) return {}
@@ -38,7 +37,7 @@ export const AletheBridgePlugin = async ({ directory }) => {
         body: JSON.stringify({ directory, state }),
       })
     } catch {
-      // best-effort - Alethe offline/porta fechada nao deve quebrar nada aqui
+      // best-effort - Alethe offline/puerto cerrado no debe romper nada aquí
     }
   }
 

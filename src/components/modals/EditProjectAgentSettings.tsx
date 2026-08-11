@@ -1,21 +1,16 @@
 import { AlertTriangle, CircleCheck, GitBranch } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { readableError } from '../../lib/errors'
-import { useT } from '../../lib/i18n'
+import { useAgentLabel, useT } from '../../lib/i18n'
 import { discoverProviderModels, gitInit, gitStatus } from '../../lib/tauri'
-import { AGENT_TYPE_LABELS, ALL_AGENT_TYPES, PROVIDER_MODELS, type AgentType } from '../../lib/types'
+import { ALL_AGENT_TYPES, PROVIDER_MODELS, type AgentType } from '../../lib/types'
 import { useProjectsStore } from '../../stores/projectsStore'
 import { useUiStore } from '../../stores/uiStore'
 import { AgentIcon } from '../icons/AgentIcons'
 import { ModelSearchablePicker, type ModelOption } from './ModelSearchablePicker'
 import controls from './controls.module.css'
 import styles from './EditProjectModal.module.css'
-
-const ALL_AGENTS: { type: AgentType; label: string }[] = ALL_AGENT_TYPES.map((type) => ({
-  type,
-  label: AGENT_TYPE_LABELS[type],
-}))
 
 // Cache module-level (sobrevive a troca de aba/remount deste componente) —
 // evita rebater discoverProviderModels toda vez que o usuário volta pra essa aba.
@@ -65,6 +60,7 @@ export function EditProjectAgentSettings({
   onGsdWatcherEnabledChange: (enabled: boolean) => void
 }) {
   const t = useT()
+  const agentLabel = useAgentLabel()
   const pushToast = useUiStore((s) => s.pushToast)
   const enabledAgents = useProjectsStore((s) => s.preferences.enabledAgents)
   const terminalTheme = useProjectsStore((s) => s.preferences.terminalTheme ?? s.preferences.uiTheme)
@@ -72,8 +68,12 @@ export function EditProjectAgentSettings({
     (s) => s.migrateProjectTerminalsToWorktrees,
   )
 
-  const availableAgents = ALL_AGENTS.filter((a) => enabledAgents[a.type])
-  const conflictAgents = availableAgents.length > 0 ? availableAgents : ALL_AGENTS
+  const allAgents = useMemo<{ type: AgentType; label: string }[]>(
+    () => ALL_AGENT_TYPES.map((type) => ({ type, label: agentLabel(type) })),
+    [agentLabel],
+  )
+  const availableAgents = allAgents.filter((a) => enabledAgents[a.type])
+  const conflictAgents = availableAgents.length > 0 ? availableAgents : allAgents
 
   const [discoveredModels, setDiscoveredModels] = useState<ModelOption[]>([])
   const [loadingModels, setLoadingModels] = useState(false)

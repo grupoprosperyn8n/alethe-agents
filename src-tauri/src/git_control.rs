@@ -498,7 +498,7 @@ pub fn git_diff(repo_root: String, path: String, staged: bool) -> Result<String,
 
     let stdout = String::from_utf8_lossy(&output.stdout).to_string();
     if stdout.contains("Binary files ") && stdout.contains(" differ") {
-        return Err("Binary file cannot be displayed as text".to_string());
+        return Err("El archivo binario no se puede mostrar como texto".to_string());
     }
 
     Ok(stdout)
@@ -508,7 +508,7 @@ pub fn git_diff(repo_root: String, path: String, staged: bool) -> Result<String,
 pub async fn git_init(path: String) -> Result<String, String> {
     tokio::task::spawn_blocking(move || git_init_inner(path))
         .await
-        .map_err(|error| format!("git_init: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("git_init: fallo en la tarea bloqueante: {error}"))?
 }
 
 fn git_status_inner(path: String) -> Result<GitRepositoryStatus, String> {
@@ -536,7 +536,7 @@ fn git_status_inner(path: String) -> Result<GitRepositoryStatus, String> {
 pub async fn git_status(path: String) -> Result<GitRepositoryStatus, String> {
     tokio::task::spawn_blocking(move || git_status_inner(path))
         .await
-        .map_err(|error| format!("git_status: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("git_status: fallo en la tarea bloqueante: {error}"))?
 }
 
 fn git_stage_inner(repo_root: String, paths: Vec<String>) -> Result<(), String> {
@@ -548,7 +548,7 @@ fn git_stage_inner(repo_root: String, paths: Vec<String>) -> Result<(), String> 
 pub async fn git_stage(repo_root: String, paths: Vec<String>) -> Result<(), String> {
     tokio::task::spawn_blocking(move || git_stage_inner(repo_root, paths))
         .await
-        .map_err(|error| format!("git_stage: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("git_stage: fallo en la tarea bloqueante: {error}"))?
 }
 
 fn git_unstage_inner(repo_root: String, paths: Vec<String>) -> Result<(), String> {
@@ -568,7 +568,7 @@ fn git_unstage_inner(repo_root: String, paths: Vec<String>) -> Result<(), String
 pub async fn git_unstage(repo_root: String, paths: Vec<String>) -> Result<(), String> {
     tokio::task::spawn_blocking(move || git_unstage_inner(repo_root, paths))
         .await
-        .map_err(|error| format!("git_unstage: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("git_unstage: fallo en la tarea bloqueante: {error}"))?
 }
 
 fn git_discard_inner(repo_root: String, paths: Vec<String>, untracked: bool) -> Result<(), String> {
@@ -584,7 +584,7 @@ fn git_discard_inner(repo_root: String, paths: Vec<String>, untracked: bool) -> 
 pub async fn git_discard(repo_root: String, paths: Vec<String>, untracked: bool) -> Result<(), String> {
     tokio::task::spawn_blocking(move || git_discard_inner(repo_root, paths, untracked))
         .await
-        .map_err(|error| format!("git_discard: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("git_discard: fallo en la tarea bloqueante: {error}"))?
 }
 
 fn git_commit_inner(repo_root: String, message: String) -> Result<String, String> {
@@ -601,7 +601,7 @@ fn git_commit_inner(repo_root: String, message: String) -> Result<String, String
 pub async fn git_commit(repo_root: String, message: String) -> Result<String, String> {
     tokio::task::spawn_blocking(move || git_commit_inner(repo_root, message))
         .await
-        .map_err(|error| format!("git_commit: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("git_commit: fallo en la tarea bloqueante: {error}"))?
 }
 
 /// Comando git que fala com o remoto (push/pull). `GIT_TERMINAL_PROMPT=0` faz o
@@ -651,7 +651,7 @@ fn git_push_inner(repo_root: String) -> Result<String, String> {
 pub async fn git_push(repo_root: String) -> Result<String, String> {
     tokio::task::spawn_blocking(move || git_push_inner(repo_root))
         .await
-        .map_err(|error| format!("git_push: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("git_push: fallo en la tarea bloqueante: {error}"))?
 }
 
 /// Lista os branches locais (nome curto). Usado pelo ciclo de merge (RFC-006)
@@ -670,7 +670,7 @@ fn git_list_branches_inner(repo_root: String) -> Result<Vec<String>, String> {
 pub async fn git_list_branches(repo_root: String) -> Result<Vec<String>, String> {
     tokio::task::spawn_blocking(move || git_list_branches_inner(repo_root))
         .await
-        .map_err(|error| format!("git_list_branches: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("git_list_branches: fallo en la tarea bloqueante: {error}"))?
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -806,7 +806,7 @@ pub async fn git_diff_summary(
         git_diff_summary_inner(repo_root, source, target, worktree_path)
     })
     .await
-    .map_err(|error| format!("git_diff_summary: falha na task bloqueante: {error}"))?
+    .map_err(|error| format!("git_diff_summary: fallo en la tarea bloqueante: {error}"))?
 }
 
 fn git_pull_inner(repo_root: String) -> Result<String, String> {
@@ -820,7 +820,7 @@ fn git_pull_inner(repo_root: String) -> Result<String, String> {
 pub async fn git_pull(repo_root: String) -> Result<String, String> {
     tokio::task::spawn_blocking(move || git_pull_inner(repo_root))
         .await
-        .map_err(|error| format!("git_pull: falha na task bloqueante: {error}"))?
+        .map_err(|error| format!("git_pull: fallo en la tarea bloqueante: {error}"))?
 }
 
 #[cfg(test)]
@@ -1185,7 +1185,7 @@ mod tests {
         let result = git_diff(root_string.clone(), "bin.dat".to_string(), true);
         assert!(result.is_err(), "binary file should return an error");
         assert!(
-            result.unwrap_err().contains("Binary file"),
+            result.unwrap_err().contains("binario"),
             "error must mention binary file"
         );
 

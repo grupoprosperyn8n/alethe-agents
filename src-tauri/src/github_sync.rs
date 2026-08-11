@@ -146,16 +146,16 @@ async fn create_gist(
         .json(body)
         .send()
         .await
-        .map_err(|e| format!("request failed: {e}"))?;
+        .map_err(|e| format!("la solicitud falló: {e}"))?;
     if !resp.status().is_success() {
-        return Err(format!("github returned {}", resp.status()));
+        return Err(format!("github devolvió {}", resp.status()));
     }
-    let value: Value = resp.json().await.map_err(|e| format!("json parse: {e}"))?;
+    let value: Value = resp.json().await.map_err(|e| format!("error al analizar el JSON: {e}"))?;
     value
         .get("id")
         .and_then(|v| v.as_str())
         .map(|s| s.to_string())
-        .ok_or_else(|| "gist response missing id".to_string())
+        .ok_or_else(|| "la respuesta del gist no tiene id".to_string())
 }
 
 /// Resolve o conteúdo de um arquivo do gist, buscando o `raw_url` se o GitHub
@@ -185,9 +185,9 @@ async fn gist_file_content(
     let resp = auth(client.get(raw_url), token)
         .send()
         .await
-        .map_err(|e| format!("request failed: {e}"))?;
+        .map_err(|e| format!("la solicitud falló: {e}"))?;
     if !resp.status().is_success() {
-        return Err(format!("github returned {}", resp.status()));
+        return Err(format!("github devolvió {}", resp.status()));
     }
     let text = resp.text().await.map_err(|e| e.to_string())?;
     Ok(Some(text))
@@ -213,14 +213,14 @@ pub async fn github_sync_set_token(
     let resp = auth(client.get(format!("{GITHUB_API}/user")), &token)
         .send()
         .await
-        .map_err(|e| format!("request failed: {e}"))?;
+        .map_err(|e| format!("la solicitud falló: {e}"))?;
     if resp.status().as_u16() == 401 {
         return Err("invalid_token".to_string());
     }
     if !resp.status().is_success() {
-        return Err(format!("github returned {}", resp.status()));
+        return Err(format!("github devolvió {}", resp.status()));
     }
-    let body: Value = resp.json().await.map_err(|e| format!("json parse: {e}"))?;
+    let body: Value = resp.json().await.map_err(|e| format!("error al analizar el JSON: {e}"))?;
     let login = body
         .get("login")
         .and_then(|v| v.as_str())
@@ -265,14 +265,14 @@ pub async fn github_sync_push(app: AppHandle) -> Result<GithubSyncStatus, String
             .json(&body)
             .send()
             .await
-            .map_err(|e| format!("request failed: {e}"))?;
+            .map_err(|e| format!("la solicitud falló: {e}"))?;
         let code = resp.status().as_u16();
         if !resp.status().is_success() {
             if code == 404 || code == 422 {
                 // gist removido ou inválido → recria
                 new_id = Some(create_gist(&client, &cfg.token, &body).await?);
             } else {
-                return Err(format!("github returned {}", resp.status()));
+                return Err(format!("github devolvió {}", resp.status()));
             }
         }
     } else {
@@ -302,14 +302,14 @@ pub async fn github_sync_pull(app: AppHandle) -> Result<GithubSyncStatus, String
     let resp = auth(client.get(format!("{GITHUB_API}/gists/{id}")), &cfg.token)
         .send()
         .await
-        .map_err(|e| format!("request failed: {e}"))?;
+        .map_err(|e| format!("la solicitud falló: {e}"))?;
     if resp.status().as_u16() == 404 {
         return Err("no_remote".to_string());
     }
     if !resp.status().is_success() {
-        return Err(format!("github returned {}", resp.status()));
+        return Err(format!("github devolvió {}", resp.status()));
     }
-    let body: Value = resp.json().await.map_err(|e| format!("json parse: {e}"))?;
+    let body: Value = resp.json().await.map_err(|e| format!("error al analizar el JSON: {e}"))?;
     let files = body
         .get("files")
         .and_then(|f| f.as_object())
