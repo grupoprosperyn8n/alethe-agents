@@ -1,0 +1,63 @@
+# OpenSpec config — SO Multi Agente (fork de Alethe)
+# Initialized by sdd-init on 2026-08-11.
+schema: spec-driven
+
+context: |
+  Tech stack: Tauri 2 + React 18.3 + TypeScript 5.6 + Vite 6 + Zustand 5 + xterm.js (frontend); Rust edition 2021 + Tauri 2 + portable-pty/tokio (backend, src-tauri/)
+  Architecture: desktop multi-agent orchestrator. Frontend React (src/components/, src/stores/ Zustand, src/lib/tauri/ IPC wrappers); backend Rust tauri commands (src-tauri/src, lib.rs invoke_handler)
+  Testing: vitest (jsdom, globals) on src/**/*.test.ts + cargo test --lib; ~148 FE tests / 22 files, ~121 BE tests
+  Style: CSS Modules + theme tokens (src/styles/theme.css), no Tailwind; strict design system (no gradients, no generic UI)
+  Conventions: comments/user-facing strings in English; i18n mandatory (src/lib/i18n/messages/en.ts source of truth + pt-BR.ts typed); changelog mandatory (docs/CHANGELOG.md, [Não lançado] section); IPC only via src/lib/tauri wrappers (eslint no-restricted-imports); projects.json schema versioned with migration/backfill
+
+testing:
+  strict_tdd: true
+  detected: 2026-08-11
+  runners:
+    - name: frontend
+      framework: vitest
+      command: npm test
+      layers:
+        unit: true
+        integration: false
+        e2e: false
+    - name: backend
+      framework: cargo (unit tests in-module)
+      command: npm run test:rust
+      layers:
+        unit: true
+        integration: false
+        e2e: false
+  coverage:
+    available: false
+    command: ""
+  quality:
+    lint: npm run lint
+    typecheck: npm run build
+    format: npm run format:check
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    - Follow existing code patterns (CSS Modules + theme tokens, lib/tauri wrappers, i18n via t())
+    - Comments and user-facing strings in English
+    - Update docs/CHANGELOG.md under [Não lançado] when a feature changes
+    tdd: true
+    test_command: npm test
+    rust_test_command: npm run test:rust
+  verify:
+    test_command: npm test
+    rust_test_command: npm run test:rust
+    build_command: npm run build
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas

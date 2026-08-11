@@ -1,144 +1,154 @@
-# Alethe — guia de trabalho (IA)
+# SO Multi Agente — agent working guide
 
-> Conteúdo idêntico ao [`AGENTS.md`](AGENTS.md) deste diretório. Mantenha os dois em sincronia.
-> Contribuindo de fora? Comece por [`CONTRIBUTING.md`](CONTRIBUTING.md) — setup, layout do
-> projeto, regras da casa e convenção de PR.
+> Content identical to [`CLAUDE.md`](CLAUDE.md) in this directory. Keep both in sync.
+> Contributing from outside? Start at [`CONTRIBUTING.md`](CONTRIBUTING.md) — setup, project
+> layout, house rules, and PR conventions.
 
-## 1. O que é
+## 1. What it is
 
-**Alethe** é um app desktop **Windows-first** que organiza, opera e retoma múltiplos agentes de
-código (Claude Code, Codex, OpenCode) e shells em paralelo, dentro de uma workspace persistente com
-terminais reais (PTYs), layouts, temas, histórico e controle de RAM.
+**SO Multi Agente** is a desktop app (fork of Alethe) that organizes, operates, and resumes
+multiple coding agents (Claude Code, Codex, OpenCode, Hermes, Antigravity, Pi) and shells in
+parallel, inside a persistent workspace with real terminals (PTYs), layouts, themes, history,
+RAM control, GSD task scheduling, merge center, and multi-agent orchestration features.
 
-> Tagline: **Reveal the state of every agent, shell, and project.**
-> Status: **v1.3.0**, MVP funcional em polish. Identifier: `com.kc1t.alethe`.
+> Tagline: orchestrate every agent, shell, and project.
+> Status: v0.1.0. Identifier: `com.kc1t.alethe` (legacy upstream id).
 
-## 2. Onde você está
+## 2. Where you are
 
-Na raiz do repositório — o diretório do app. Aqui ficam:
+At the repository root — the app directory. Here you will find:
 
-- `src/` — frontend React.
-- `src-tauri/` — backend Rust/Tauri.
-- `docs/` — docs versionados (`FEATURES.md`, `CHANGELOG.md`, `OVERVIEW.md`, `BRAND.md`,
+- `src/` — React frontend (components, stores, lib, hooks).
+- `src-tauri/` — Rust/Tauri backend (60 modules under `src-tauri/src/`).
+- `openspec/` — SDD artifact store (changes, specs) used by the SDD workflow.
+- `docs/` — versioned docs (`FEATURES.md`, `CHANGELOG.md`, `OVERVIEW.md`, `BRAND.md`,
   `DIAGNOSTICO_MATURIDADE_TECNICA.md`).
-- `package.json`, `vite.config.ts`, `tsconfig.json`, `tests/`.
+- `package.json`, `vite.config.ts`, `tsconfig.json`.
 
 ## 3. Stack
 
-- **Frontend:** React 18.3 · TypeScript 5.6 · Vite 6 · Zustand 5 · xterm.js 5.5 (`@xterm/addon-fit`, `-search`, `-webgl`) · `react-resizable-panels` · `@dnd-kit/core` · `@radix-ui/react-dialog` · `lucide-react` · `nanoid`.
-- **Backend:** Rust (edition 2021) · Tauri 2 · `portable-pty` (ConPTY no Windows) · `tokio` · `reqwest` · `keyring` · `serde`.
-- **Estilo:** CSS Modules + CSS custom properties (sem Tailwind, sem styled-components).
+- **Frontend:** React 18.3 · TypeScript 5.6 · Vite 6 · Zustand 5 · xterm.js 5.5
+  (`@xterm/addon-fit`, `-search`, `-webgl`, `-canvas`, `-unicode11`) · `react-resizable-panels` ·
+  `@dnd-kit/core` · `@radix-ui/react-dialog` · `lucide-react` · `nanoid`.
+- **Backend:** Rust (edition 2021) · Tauri 2 · `portable-pty` · `tokio` · `reqwest` (rustls) ·
+  `keyring` (per-platform secure store) · `serde` · `rusqlite` (read-only Claude DB).
+- **Style:** CSS Modules + CSS custom properties (no Tailwind, no styled-components).
 
-## 4. Comandos (de `package.json`)
+## 4. Commands (from `package.json`)
 
-```powershell
+```bash
 npm install
-npm run app      # = tauri dev — roda o app completo com hot reload (FORMA RECOMENDADA)
-npm run dev      # só o frontend Vite em http://localhost:1422 (strictPort)
-npm run build    # tsc + vite build — o tsc faz typecheck e VALIDA o i18n (ver §5)
-npm test         # vitest run sobre tests/**/*.test.ts (test:node roda via node --test, à parte)
+npm run app          # = tauri dev — runs the full app with hot reload (RECOMMENDED)
+npm run dev          # frontend Vite only at http://localhost:1422 (strictPort)
+npm run build        # tsc + vite build — typecheck and VALIDATES i18n (see §5)
+npm test             # vitest run over src/**/*.test.ts (148 tests)
+npm run test:rust    # cargo test --lib (121 tests)
+npm run lint         # eslint (also enforced in CI)
+npm run format:check # prettier --check
 ```
 
-**Build do instalador Windows (MSI/NSIS)** precisa do ambiente MSVC (`vcvars64`):
+Strict TDD is active for this project: write/update tests with the code, run
+`npm test` (frontend) and `npm run test:rust` (backend) before finishing a task.
 
-```powershell
-cmd /c '"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat" >NUL && npm run tauri build'
-```
+## 5. Non-negotiable rules
 
-Ao retornar o caminho de um instalador gerado, informe sempre o **caminho absoluto completo no PC**
-(por exemplo, `D:\projeto\src-tauri\target\release\bundle\nsis\Alethe_setup.exe`), nunca apenas o
-caminho relativo ao repositório.
+1. **Do NOT close or restart the app or dev server** (`tauri dev` / Vite). Do not kill the
+   process, do not run `npm run app` "to test" if it is already running. Apply changes via
+   **HMR** and trust the reload.
+2. **Do NOT commit / push / tag / release without explicit owner permission at the time.**
+   Make changes **only in the working tree** and stop — the owner decides when to commit. When
+   the owner authorizes a commit, **do NOT add co-author** (`Co-Authored-By: …`) or any tool
+   signature to the message — the author is the owner only.
+3. **Strict design system — no gradients, no "vibecoded" UI.** No generic template UI.
+   Dashboards and widgets show **real data**, never placeholder/mock. Style via CSS Modules +
+   tokens from `src/styles/theme.css`; **never** hardcode colors — use the variables
+   (`--bg`, `--fg`, `--accent`, `--agent-*`, `--status-*`, etc.).
+4. **i18n mandatory.** Every visible string goes through `t()`/`useT()`. The source of truth is
+   `src/lib/i18n/messages/es.ts` (default locale is `es`). Adding a key requires adding it in
+   **all three** locale files (`es.ts`, `en.ts`, `pt-BR.ts`) — `pt-BR.ts` is typed as
+   `Record<MessageKey, string>`, so `npm run build` **fails** if a translation is missing.
+5. **Changelog mandatory for features.** Every feature addition, change, or removal must update
+   [`docs/CHANGELOG.md`](docs/CHANGELOG.md) in the same task, under the **`[Unreleased]`**
+   section (top of file), with a short, objective, user-facing description. Never skip this
+   step — the changelog is the release-notes source.
 
-Detalhes em `docs/BUILD_WINDOWS.md` (não versionado neste repo — só na máquina do dono).
-
-## 5. Regras inegociáveis
-
-1. **NÃO encerre nem reinicie o app nem o dev server** (`tauri dev` / Vite). Não mate o processo,
-   não rode `npm run app` "pra testar" se já estiver rodando. Aplique mudanças via **HMR** e confie no reload.
-2. **NÃO faça commit / push / tag / release sem permissão explícita do dono na hora.** Faça as
-   alterações **só no working tree** e pare — quem decide commitar é ele. Quando ele autorizar um
-   commit, **NÃO adicione co-autor** (`Co-Authored-By: Claude …`) nem qualquer assinatura de
-   ferramenta na mensagem — o autor é só ele.
-3. **Design system estrito — sem gradientes, sem "vibecoded".** Nada de UI genérica de template.
-   Dashboards e widgets mostram **dado real**, nunca placeholder/mock. Estilo via CSS Modules +
-   tokens de `src/styles/theme.css`; **nunca** hardcode de cor — use as variáveis (`--bg`, `--fg`,
-   `--accent`, `--agent-*`, `--status-*`, etc.).
-4. **i18n obrigatório.** Toda string visível passa por `t()`. Ao adicionar texto, registre a chave
-   em `src/lib/i18n/messages/en.ts` (**fonte da verdade**, default EN) **e** em
-   `src/lib/i18n/messages/pt-BR.ts`. O `pt-BR.ts` é tipado contra as chaves de `en.ts`, então
-   `npm run build` **falha** se faltar tradução.
-5. **Changelog obrigatório para features.** Toda adição, alteração ou remoção de feature deve
-   atualizar [`docs/CHANGELOG.md`](docs/CHANGELOG.md) na mesma tarefa, sob a seção
-   **`[Não lançado]`** (topo do arquivo), com uma descrição curta, objetiva e voltada ao
-   usuário. Nunca pule esse passo — o changelog é a fonte das notas de release.
-
-## 6. Arquitetura rápida
+## 6. Quick architecture
 
 **Frontend (`src/`)**
-- `components/` — UI por feature (`HomeView/`, `WorkspaceView/`, `XTermView/`, `ProjectSidebar/`, `TitleBar/`, `modals/`…). 1 `.module.css` por componente.
-- `stores/` — Zustand: `projectsStore` (projetos/grupos/terminais/preferences, **persistido** em `projects.json`) e `uiStore` (modais/toasts/efêmero).
-- `lib/tauri/` — wrapper de `invoke`, dividido por domínio (`git`, `pty`, `agents`, `usage`…), com `index.ts` reexportando tudo — call-sites continuam importando de `lib/tauri` sem mudança.
-- `lib/i18n/` — sistema de i18n (`index.ts` + `messages/en.ts` + `messages/pt-BR.ts`).
-- `lib/types.ts` — tipos do domínio (`AgentType`, `Terminal`, `Project`, `Group`, `GridLayout`…).
-- `styles/theme.css` + `styles/reset.css` — tokens e reset.
+- `components/` — UI by feature (`HomeView/`, `WorkspaceView/`, `XTermView/`, `ProjectSidebar/`,
+  `TitleBar/`, `modals/`…). One `.module.css` per component.
+- `stores/` — Zustand: `projectsStore` (projects/groups/terminals/preferences, **persisted** in
+  `projects.json`, split into slices) plus domain stores (`uiStore`, `terminalsStore`,
+  `schedulerStore`, `mergeStore`, `agentCanvasStore`, `agentSandboxStore`, `graphifyStore`…).
+- `lib/tauri/` — `invoke` wrapper, split by domain (`git`, `pty`, `agents`, `usage`…), with
+  `index.ts` re-exporting everything — call sites keep importing from `lib/tauri`. ESLint
+  forbids raw `invoke()` outside `lib/tauri/**`.
+- `lib/i18n/` — i18n system (`index.ts` + `messages/es.ts` + `messages/en.ts` + `messages/pt-BR.ts`).
+- `lib/types.ts` — domain types (`AgentType`, `Terminal`, `Project`, `Group`, `GridLayout`…).
+- `styles/theme.css` + `styles/reset.css` — tokens and reset.
 
 **Backend (`src-tauri/src/`)**
-- `lib.rs` — `invoke_handler` (registro de todos os `#[tauri::command]`).
-- `pty.rs` — spawn/attach/write/resize/restart/kill de PTYs + scrollback em disco.
-- `projects.rs` — load/save atômico de `projects.json`. `profiles` — multi-perfil isolado.
-- `cli_resolver.rs` — descobre CLIs (pwsh/powershell, Node managers, VS Code) no Windows.
-- `claude_sessions.rs` / `codex_sessions.rs` / `claude_usage.rs` — leitura de sessões e uso.
-- `spotify.rs`, `backup.rs`, `diagnostics.rs`, `agent_library.rs`, `agent_events.rs`, `stats.rs`.
+- `lib.rs` — `invoke_handler` (registration of all `#[tauri::command]`) + app setup.
+- `pty.rs` — spawn/attach/write/resize/restart/kill of PTYs + on-disk scrollback.
+- `projects.rs` — atomic load/save of `projects.json` (monotonic write sequence).
+- `cli_resolver.rs` — discovers CLIs (pwsh/powershell, Node managers, VS Code, agents).
+- `remote.rs` — LAN remote control (HTTP + WebSocket with pairing token/QR).
+- `scheduler.rs` / `supervisor.rs` / `agent_events.rs` — GSD task scheduling, supervision,
+  agent event hooks. `opencode_gsd_plugin.rs` — deterministic `.planning/` writer plugin.
+- `git_control.rs` / `worktrees.rs` / `merge_analyzer.rs` / `conflict_resolution.rs` — git.
+- `claude_sessions.rs` / `codex_sessions.rs` / `agent_cost.rs` — session/usage reads.
 
-**Comunicação:** frontend chama `invoke(...)` via `lib/tauri/`; o terminal recebe streaming por
-eventos Tauri `pty://data/{id}` e `pty://exit/{id}`.
+**Communication:** frontend calls `invoke(...)` via `lib/tauri/`; the terminal receives
+streaming via Tauri events `pty://data/{id}` and `pty://exit/{id}`.
 
-## 7. Convenções
+## 7. Conventions
 
-- 1 arquivo `.module.css` por componente; cor/spacing sempre via tokens, nunca literal.
-- Tipos novos do domínio em `src/lib/types.ts`; reúse os existentes.
-- Selectors Zustand enxutos para evitar loops de rerender; `projects.json` salva com debounce e
-  escrita atômica (tmp → rename) — preserve esse padrão.
-- Schema de `projects.json` é versionado com migração/backfill — ao mudar shape, mantenha a migração.
+- One `.module.css` per component; color/spacing always via tokens, never literals.
+- New domain types go into `src/lib/types.ts`; reuse existing ones.
+- Keep Zustand selectors narrow to avoid rerender loops; `projects.json` saves with debounce
+  and atomic write (tmp → rename) — preserve that pattern.
+- `projects.json` schema is versioned with migration/backfill — when changing shape, keep the
+  migration.
+- Spanish is the UI language (default locale `es`, neutral professional Spanish). Locale files
+  are the only place user-facing translations live.
+- New code comments, JSDoc, changelog entries: keep them concise; English or Spanish is
+  acceptable, but do not mix within one file without reason.
 
-## 8. Gotchas / segurança
+## 8. Gotchas / security
 
-- `csp: null` em `tauri.conf.json` → o webview tem acesso total ao IPC. Trate qualquer entrada
-  renderizada como não-confiável.
-- `spawn_pty` executa shell com comando/args vindos do frontend — **valide entrada no front** antes de spawnar.
-- Tokens OAuth (Spotify, Claude) ficam em **plaintext** no app data; não logue nem exponha.
-- Build Windows exige `vcvars64`. A toolchain Rust em `C:` pode ser corrompida pelo Windows Defender
-  — preferir buildar de `D:`.
-- Dados locais: `%APPDATA%/Alethe/` (perfis, `projects.json`, scrollback `*.bin`, `spawn.log`).
+- `csp: null` in `tauri.conf.json` → the webview has full IPC access. Treat any rendered input
+  as untrusted. (Planned: enforce a strict CSP.)
+- `spawn_pty` executes a shell with commands/args from the frontend — validate input on the
+  frontend before spawning.
+- OAuth tokens (Spotify, GitHub) are currently stored in plaintext app data; do not log or
+  expose them. (Planned: move to keyring.)
+- Local data: `~/.local/share/…` / `%APPDATA%` (profiles, `projects.json`, scrollback `*.bin`,
+  `spawn.log`). Remote pairing token is memory-only, regenerated each boot.
+- `profile.release` uses `panic = "abort"` — avoid `unwrap()` on background threads.
 
-## 9. Aprofundar
+## 9. Dig deeper
 
-Versionado neste repo:
+Versioned in this repo:
 
-- [`CONTRIBUTING.md`](CONTRIBUTING.md) — setup por SO, layout, regras da casa, convenção de commit/PR.
-- [`docs/FEATURES.md`](docs/FEATURES.md) — features em detalhe.
-- [`docs/CHANGELOG.md`](docs/CHANGELOG.md) — histórico voltado ao usuário.
-- [`docs/OVERVIEW.md`](docs/OVERVIEW.md) — modelo de domínio (Grupo, Projeto, Container, Pane,
-  Terminal, Sub-tab, PTY), stack e persistência.
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — per-OS setup, layout, house rules, commit/PR convention.
+- [`docs/FEATURES.md`](docs/FEATURES.md) — features in detail.
+- [`docs/CHANGELOG.md`](docs/CHANGELOG.md) — user-facing history.
+- [`docs/OVERVIEW.md`](docs/OVERVIEW.md) — domain model (Group, Project, Container, Pane,
+  Terminal, Sub-tab, PTY), stack, and persistence.
 - [`docs/BRAND.md`](docs/BRAND.md).
-- [`docs/DIAGNOSTICO_MATURIDADE_TECNICA.md`](docs/DIAGNOSTICO_MATURIDADE_TECNICA.md) — diagnóstico
-  de organização, duplicação e performance do código, com recomendações priorizadas.
-
-Só na máquina do dono (não versionado): `CODE_STANDARDS.md`, `GLOSSARY.md`, `CONTEXTO_IA.md`,
-`HANDOFF_STATUS.md`, `CURRENT_STEP.md`. O glossário do domínio (Grupo, Projeto, Container, Pane,
-Sub-tab, PTY) está resumido no `CONTRIBUTING.md`.
+- [`docs/DIAGNOSTICO_MATURIDADE_TECNICA.md`](docs/DIAGNOSTICO_MATURIDADE_TECNICA.md) — code
+  organization/duplication/performance diagnosis with prioritized recommendations.
 
 ## graphify
 
 ## Language and comment rules
 
-- Write all new source comments, JSDoc, documentation, changelog entries, and user-facing strings in English.
-- Locale files are the only exception: translated UI text belongs in the matching locale file.
+- Write user-facing strings in Spanish (neutral/professional) via the i18n locale files.
 - Keep comments concise. Add them only when they explain non-obvious behavior, constraints, or decisions.
 
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
 
-Universal across the 3 agent providers Alethe spawns (Claude Code, Codex, OpenCode) when the project has Graphify enabled: each gets the Graphify MCP server wired into its session automatically (Claude via `--mcp-config`; Codex/OpenCode via `.codex/config.toml`/`opencode.json` in the project root — see `graphify_codex_config_write`/`graphify_opencode_config_write` in `src-tauri/src/graphify.rs`).
+Universal across the agent providers the app spawns (Claude Code, Codex, OpenCode) when the project has Graphify enabled: each gets the Graphify MCP server wired into its session automatically (Claude via `--mcp-config`; Codex/OpenCode via `.codex/config.toml`/`opencode.json` in the project root — see `graphify_codex_config_write`/`graphify_opencode_config_write` in `src-tauri/src/graphify.rs`).
 
 Rules:
 - If a Graphify MCP tool (e.g. `graphify_query`/similar) is available in this session, prefer calling it directly over shelling out — same scoped-subgraph result, no extra process spawn.
