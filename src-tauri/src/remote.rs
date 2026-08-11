@@ -1,4 +1,4 @@
-//! LAN-only remote control for existing Alethe terminal sessions.
+//! LAN-only remote control for existing SO Multi Agente terminal sessions.
 //!
 //! The remote surface is intentionally read-mostly: it exposes workspace
 //! metadata and terminal output, and accepts one complete prompt at a time.

@@ -153,8 +153,8 @@ pub fn codex_app_server_start(
             "method": "initialize",
             "params": {
                 "clientInfo": {
-                    "name": "alethe-agent-sandbox",
-                    "title": "Alethe Agent Sandbox",
+                    "name": "so-multi-agente-agent-sandbox",
+                    "title": "SO Multi Agente Agent Sandbox",
                     "version": env!("CARGO_PKG_VERSION")
                 }
             }

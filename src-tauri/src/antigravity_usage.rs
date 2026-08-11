@@ -96,7 +96,7 @@ async fn fetch_models(token: &str) -> Result<serde_json::Value, FetchError> {
     let response = http_client()
         .post(MODELS_URL)
         .bearer_auth(token)
-        .header("User-Agent", "alethe/1.2.5 antigravity-usage")
+        .header("User-Agent", "so-multi-agente/0.1.0 antigravity-usage")
         .json(&serde_json::json!({}))
         .send()
         .await

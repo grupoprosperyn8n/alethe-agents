@@ -89,7 +89,7 @@ fn fetch_usage() -> Result<CodexUsage, String> {
 
     // Handshake + leitura dos limites. id=2 é a resposta que nos interessa.
     let requests = concat!(
-        r#"{"id":1,"method":"initialize","params":{"clientInfo":{"name":"alethe","version":"1.2.0"}}}"#,
+        r#"{"id":1,"method":"initialize","params":{"clientInfo":{"name":"so-multi-agente","version":"1.2.0"}}}"#,
         "\n",
         r#"{"method":"initialized"}"#,
         "\n",

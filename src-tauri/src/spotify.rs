@@ -251,7 +251,7 @@ fn wait_for_oauth_callback(expected_state: &str) -> Result<String, String> {
             }
         }
 
-        let success_html = b"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\n\r\n<html><body style='background:#0d0d0d;color:#e8e8e8;font-family:system-ui;display:grid;place-items:center;height:100vh;margin:0'><div style='text-align:center'><h1 style='font-weight:500'>Conectado a Spotify</h1><p style='color:#888'>Puedes cerrar esta pesta\xF1a y volver a Alethe.</p></div></body></html>";
+        let success_html = b"HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\n\r\n<html><body style='background:#0d0d0d;color:#e8e8e8;font-family:system-ui;display:grid;place-items:center;height:100vh;margin:0'><div style='text-align:center'><h1 style='font-weight:500'>Conectado a Spotify</h1><p style='color:#888'>Puedes cerrar esta pesta\xF1a y volver a SO Multi Agente.</p></div></body></html>";
         let _ = stream.write_all(success_html);
         let _ = stream.flush();
 

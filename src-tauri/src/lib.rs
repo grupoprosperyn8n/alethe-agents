@@ -168,7 +168,7 @@ pub fn run() {
         .setup(move |app| {
             #[cfg(debug_assertions)]
             if let Some(window) = app.get_webview_window("main") {
-                let _ = window.set_title("(DEV) Alethe");
+                let _ = window.set_title("(DEV) SO Multi Agente");
             }
             // `tauri dev` no Linux não instala `.desktop` file nenhum (só um
             // build empacotado via .deb/AppImage faz isso), então KWin/GNOME

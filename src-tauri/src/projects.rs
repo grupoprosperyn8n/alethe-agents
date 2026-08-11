@@ -174,7 +174,7 @@ fn repo_folder_name(normalized_url: &str) -> String {
 
 /// `target_dir` vazio = deixa o app escolher. Antes o frontend montava um
 /// `D:\Projetos\<nome>` fixo, que não existe na maioria das máquinas e nem faz
-/// sentido fora do Windows. O default agora é `~/Alethe/<repo>`, e um diretório
+/// sentido fora do Windows. O default agora é `~/SO Multi Agente/<repo>`, e um diretório
 /// escolhido pelo usuário é usado como PAI do clone (o `git clone` cria a pasta
 /// do repo dentro dele), a menos que já termine no nome do repo.
 fn resolve_clone_target(requested: &str, normalized_url: &str) -> Result<String, String> {
@@ -183,7 +183,7 @@ fn resolve_clone_target(requested: &str, normalized_url: &str) -> Result<String,
     let base = if trimmed.is_empty() {
         dirs_next::home_dir()
             .ok_or_else(|| "No fue posible localizar la carpeta del usuario".to_string())?
-            .join("Alethe")
+            .join("SO Multi Agente")
     } else {
         std::path::PathBuf::from(trimmed)
     };
@@ -272,8 +272,8 @@ fn generate_repo_context_files(project_dir: &str) -> Result<(), String> {
     };
 
     let context_markdown = format!(
-        "# Contexto Inicial del Proyecto (Alethe AI Briefing)\n\n\
-        > Este repositorio fue clonado con Alethe. El briefing a continuación describe la aplicación para orientar su asistencia.\n\n\
+        "# Contexto Inicial del Proyecto (SO Multi Agente AI Briefing)\n\n\
+        > Este repositorio fue clonado con SO Multi Agente. El briefing a continuación describe la aplicación para orientar su asistencia.\n\n\
         ## Tecnologías Detectadas\n- {stack_str}\n\n\
         ## Resumen del Repositorio (README)\n```markdown\n{truncated_readme}\n```\n\n\
         ## Instrucción Importante para el Agente\n\
