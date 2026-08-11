@@ -14,6 +14,47 @@ pub struct MemoryStats {
     pub system_available_mb: f64,
 }
 
+/// Bucket de memória de um processo do subtree do app.
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+enum ProcessClass {
+    App,
+    Webview,
+    Pty,
+}
+
+/// Classifica um processo do subtree: o próprio app (root ou nome do binário
+/// atual, match exato) e os filhos `ensemble` vão pra conta do app; o webview
+/// vai pra conta dele; o resto são PTYs. `name` já vem em lowercase.
+fn classify_process(pid: usize, root_pid: usize, name: &str, own_names: &[String]) -> ProcessClass {
+    if pid == root_pid || own_names.iter().any(|n| n == name) || name.contains("ensemble") {
+        ProcessClass::App
+    } else if name.contains("msedgewebview2") {
+        ProcessClass::Webview
+    } else {
+        ProcessClass::Pty
+    }
+}
+
+/// Nomes esperados do binário próprio, derivados em runtime de
+/// `std::env::current_exe()` (file_name + stem, lowercase). Match EXATO:
+/// processos legacy `alethe` ou o shim CLI não contam como o app.
+fn own_process_names() -> Vec<String> {
+    let mut names = Vec::new();
+    let Ok(exe) = std::env::current_exe() else {
+        return names;
+    };
+    if let Some(file_name) = exe.file_name().and_then(|n| n.to_str()) {
+        names.push(file_name.to_ascii_lowercase());
+    }
+    if let Some(stem) = exe.file_stem().and_then(|n| n.to_str()) {
+        let stem = stem.to_ascii_lowercase();
+        if !names.contains(&stem) {
+            names.push(stem);
+        }
+    }
+    names
+}
+
 fn shared_system() -> &'static Mutex<System> {
     static SYS: OnceLock<Mutex<System>> = OnceLock::new();
     SYS.get_or_init(|| Mutex::new(System::new()))
@@ -57,18 +98,17 @@ pub fn collect_memory_stats() -> MemoryStats {
     let mut app_bytes: u64 = 0;
     let mut webview_bytes: u64 = 0;
     let mut pty_bytes: u64 = 0;
+    let own_names = own_process_names();
     for pid in &visited {
         let Some(process) = sys.process(Pid::from(*pid)) else {
             continue;
         };
         let mem = process.memory();
         let name = process.name().to_string_lossy().to_ascii_lowercase();
-        if *pid == root_pid || name.contains("alethe") || name.contains("ensemble") {
-            app_bytes += mem;
-        } else if name.contains("msedgewebview2") {
-            webview_bytes += mem;
-        } else {
-            pty_bytes += mem;
+        match classify_process(*pid, root_pid, &name, &own_names) {
+            ProcessClass::App => app_bytes += mem,
+            ProcessClass::Webview => webview_bytes += mem,
+            ProcessClass::Pty => pty_bytes += mem,
         }
     }
 
@@ -111,4 +151,66 @@ pub fn get_memory_stats() -> MemoryStats {
 /// a varredura sem refazer o `refresh_processes(All)` quando o front acabou de pollar.
 pub fn memory_stats_cached() -> MemoryStats {
     cached_memory_stats()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn root_pid_is_always_app() {
+        assert!(matches!(
+            classify_process(42, 42, "anything", &[]),
+            ProcessClass::App
+        ));
+    }
+
+    #[test]
+    fn current_binary_name_is_app() {
+        let own = vec!["so-multi-agente".to_string()];
+        assert!(matches!(
+            classify_process(7, 42, "so-multi-agente", &own),
+            ProcessClass::App
+        ));
+    }
+
+    #[test]
+    fn legacy_alethe_name_is_not_app() {
+        let own = vec!["so-multi-agente".to_string()];
+        assert!(matches!(
+            classify_process(7, 42, "alethe", &own),
+            ProcessClass::Pty
+        ));
+    }
+
+    #[test]
+    fn cli_shim_binary_is_not_app() {
+        let own = vec!["so-multi-agente".to_string()];
+        assert!(matches!(
+            classify_process(7, 42, "so-multi-agente-cli", &own),
+            ProcessClass::Pty
+        ));
+    }
+
+    #[test]
+    fn ensemble_children_stay_in_app_bucket() {
+        let own = vec!["so-multi-agente".to_string()];
+        assert!(matches!(
+            classify_process(7, 42, "ensemble", &own),
+            ProcessClass::App
+        ));
+    }
+
+    #[test]
+    fn webview_process_is_webview() {
+        assert!(matches!(
+            classify_process(7, 42, "msedgewebview2", &[]),
+            ProcessClass::Webview
+        ));
+    }
+
+    #[test]
+    fn own_process_names_is_not_empty() {
+        assert!(!own_process_names().is_empty());
+    }
 }
